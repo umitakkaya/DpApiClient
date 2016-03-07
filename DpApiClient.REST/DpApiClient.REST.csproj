@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{83E8ACDC-2A02-48F3-B1C3-DBA3D5B17656}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DpApiClient.REST</RootNamespace>
+    <AssemblyName>DpApiClient.REST</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.105.2.3\lib\net46\RestSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Client\DPPutSlotException.cs" />
+    <Compile Include="Client\Locale.cs" />
+    <Compile Include="DTO\BookSlotRequest.cs" />
+    <Compile Include="Client\DpApi.cs" />
+    <Compile Include="Client\DPAuthenticator.cs" />
+    <Compile Include="DTO\DPCollection.cs" />
+    <Compile Include="DTO\Address.cs" />
+    <Compile Include="DTO\AuthorizationToken.cs" />
+    <Compile Include="DTO\Booking.cs" />
+    <Compile Include="DTO\BookingExtraFields.cs" />
+    <Compile Include="DTO\DPDoctor.cs" />
+    <Compile Include="DTO\DoctorService.cs" />
+    <Compile Include="DTO\DPResponse.cs" />
+    <Compile Include="DTO\DPFacility.cs" />
+    <Compile Include="DTO\NewDoctorService.cs" />
+    <Compile Include="DTO\Notification.cs" />
+    <Compile Include="DTO\NotificationData.cs" />
+    <Compile Include="DTO\Patient.cs" />
+    <Compile Include="DTO\PutSlotsRequest.cs" />
+    <Compile Include="DTO\Service.cs" />
+    <Compile Include="DTO\Slot.cs" />
+    <Compile Include="DTO\SlotDoctorService.cs" />
+    <Compile Include="DTO\SlotRange.cs" />
+    <Compile Include="DTO\Specialization.cs" />
+    <Compile Include="Utilities\SnakeCaseContractResolver.cs" />
+    <Compile Include="Utilities\SnakeJsonSerializerStrategy.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
