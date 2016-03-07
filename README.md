@@ -15,4 +15,5 @@ Sample &amp; simple hospital app and Docplanner API integration with written in 
     | dpapi.clientSecret  | <your_client_secret>  |
     | dpapi.locale        | (tr-TR | pl-PL)       |
   ```
+- To import the doctors (and the resources of these doctors from Docplanner run DpApiClient.Importer project)
 - Run the application
