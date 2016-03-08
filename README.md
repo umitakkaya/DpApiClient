@@ -4,6 +4,7 @@ Sample &amp; simple hospital app and Docplanner API integration with written in 
 # Getting started
 - Clone the app
 - Open the project with Visual Studio
+- Change the connection strings in the following files `DpApiClient\web.config`, `DpApiClient.Importer\app.config`
 - Navigate to `Package Manager Console`
 - Select `DpApiClient.Data` from `Default project` dropdown
 - Run `Update-Database` command to scaffold the database
