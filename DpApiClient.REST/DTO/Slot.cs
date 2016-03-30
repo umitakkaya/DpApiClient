@@ -9,6 +9,6 @@ namespace DpApiClient.REST.DTO
 {
     public class Slot
     {
-        public DateTime Start { get; set; }
+        public DateTimeOffset Start { get; set; }
     }
 }

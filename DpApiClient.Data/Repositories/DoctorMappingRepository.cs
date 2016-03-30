@@ -58,7 +58,7 @@ namespace DpApiClient.Data.Repositories
             );
         }
 
-        public DoctorMapping Map(ForeignAddress address, DoctorFacility doctorFacility)
+        public DoctorMapping Map(ForeignAddress address, DoctorFacility doctorFacility, ForeignDoctorService foreignDoctorService)
         {
             var mapping = GetByAddressAndDoctorFacility(address, doctorFacility);
 
@@ -68,7 +68,8 @@ namespace DpApiClient.Data.Repositories
                 {
                     DoctorId = doctorFacility.DoctorId,
                     FacilityId = doctorFacility.FacilityId,
-                    ForeignAddress = address
+                    ForeignAddress = address,
+                    ForeignDoctorService = foreignDoctorService
                 });
             }
 

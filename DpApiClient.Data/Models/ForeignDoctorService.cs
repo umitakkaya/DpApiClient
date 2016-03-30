@@ -12,7 +12,7 @@ namespace DpApiClient.Data
         public double? PriceMin { get; set; }
         public double? PriceMax { get; set; }
         public string ServiceId { get; set; }
-        public virtual int? DoctorId {
+        public virtual int? MappedDoctorId {
             get
             {
                 var mapping =  ForeignDoctor.ForeignAddresses
@@ -29,6 +29,7 @@ namespace DpApiClient.Data
 
         public string ForeignDoctorId { get; set; }
         public ForeignDoctor ForeignDoctor { get; set; }
+        public DoctorMapping DoctorMapping {get; set;}
 
         public virtual bool IsBelongsTo(Doctor doctor)
         {

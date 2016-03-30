@@ -2,6 +2,7 @@
 using DpApiClient.Data;
 using DpApiClient.Data.Repositories;
 using DpApiClient.REST.Client;
+using DpApiClient.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,43 +17,47 @@ namespace DpApiClient.Controllers
         private DoctorMappingRepository repo;
         private ForeignAddressRepository addressRepo;
         private DoctorFacilityRepository doctorFacilityRepo;
-        private ScheduleManager _scheduleManager;
-        private DpApi _client;
+        private ScheduleManager scheduleManager;
+        private ForeignDoctorServiceRepository doctorServiceRepo;
+        private DpApi client;
 
         public MappingController()
         {
             var db = new HospitalContext();
 
-            _client = new DpApi(AppSettings.ClientId, AppSettings.ClientSecret, (Locale)AppSettings.Locale);
+            client = new DpApi(AppSettings.ClientId, AppSettings.ClientSecret, (Locale)AppSettings.Locale);
 
-            _scheduleManager = new ScheduleManager(db, _client);
+            scheduleManager = new ScheduleManager(db, client);
             repo = new DoctorMappingRepository(db);
             addressRepo = new ForeignAddressRepository(db);
             doctorFacilityRepo = new DoctorFacilityRepository(db);
+            doctorServiceRepo = new ForeignDoctorServiceRepository(db);
         }
 
         // GET: Mapping
         public ActionResult Index()
         {
-            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo(AppSettings.Locale);
-            Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(AppSettings.Locale);
 
+            var model = new MappingViewModel()
+            {
+                ForeignAddresses = addressRepo.GetAll(),
+                DoctorFacilities = doctorFacilityRepo.GetNotMapped(),
+                ForeignDoctorServices = doctorServiceRepo.GetAll()
+            };
 
-            var addresses = addressRepo.GetAll();
-            ViewBag.DoctorFacilities = doctorFacilityRepo.GetNotMapped();
-            return View(addresses);
+            return View(model);
         }
 
 
         [HttpPost]
-        public ActionResult Map(string id, [Bind(Include = "DoctorId, FacilityId")] DoctorFacility doctorFacility)
+        public ActionResult Map(string id, [Bind(Include = "DoctorId, FacilityId")] DoctorFacility doctorFacility, string foreignDoctorServiceId)
         {
             var address = addressRepo.GetById(id);
+            var foreignDoctorService = doctorServiceRepo.GetById(foreignDoctorServiceId);
+
             try
             {
-
-
-                repo.Map(address, doctorFacility);
+                repo.Map(address, doctorFacility, foreignDoctorService);
                 repo.Save();
                 return Json(new { status = true });
             }
@@ -71,7 +76,7 @@ namespace DpApiClient.Controllers
             var mapping = repo.GetByForeignAddress(id);
             try
             {
-                bool result = _scheduleManager.PushSlots(mapping.DoctorFacility);
+                bool result = scheduleManager.PushSlots(mapping.DoctorFacility);
                 return Json(new { status = result });
             }
             catch (Exception ex)

@@ -8,6 +8,7 @@ using DpApiClient.Data;
 using DpApiClient.REST.Client;
 using DpApiClient.Data.Repositories;
 using DpApiClient.REST.DTO;
+using DpApiClient.Core.Extensions;
 
 namespace DpApiClient.Core
 {
@@ -19,6 +20,14 @@ namespace DpApiClient.Core
         private ScheduleRepository _scheduleRepo;
         private DoctorMappingRepository _mappingRepo;
         private ScheduleManager _scheduleManager;
+
+        private string timeZone
+        {
+            get
+            {
+                return ((TimeZones)AppSettings.Locale).ToString();
+            }
+        }
 
 
         public VisitManager(HospitalContext db, DpApi client, ScheduleManager scheduleManager)
@@ -43,18 +52,19 @@ namespace DpApiClient.Core
 
             var visit = _visitRepository.GetByForeignId(oldVisit.Id);
 
-            if (_scheduleManager.IsSlotExist(newVisit.StartAt.LocalDateTime, newVisit.EndAt.LocalDateTime, visit.DoctorFacility))
+            if (_scheduleManager.IsSlotExist(newVisit.StartAt.LocalDateTime.ChangeTimeZone(timeZone), newVisit.EndAt.LocalDateTime.ChangeTimeZone(timeZone), visit.DoctorFacility))
             {
                 visit.ForeignVisitId = newVisit.Id;
-                visit.StartAt = newVisit.StartAt.LocalDateTime;
-                visit.EndAt = newVisit.EndAt.LocalDateTime;
+                visit.StartAt = newVisit.StartAt.LocalDateTime.ChangeTimeZone(timeZone);
+                visit.EndAt = newVisit.EndAt.LocalDateTime.ChangeTimeZone(timeZone);
 
+                var oldSchedule = visit.DoctorSchedule;
                 var newSchedule = _scheduleManager.FindDoctorSchedule(visit.DoctorFacility, visit.StartAt, visit.EndAt, newVisit.Service.Id);
 
                 visit.DoctorSchedule = newSchedule;
                 visit.DoctorScheduleId = newSchedule.Id;
 
-                _scheduleManager.RestoreSchedule(visit);
+                _scheduleManager.RestoreSchedule(oldSchedule);
                 _scheduleManager.ArrangeSchedule(visit);
 
                 return true;
@@ -76,7 +86,7 @@ namespace DpApiClient.Core
 
             var mapping = visit.DoctorFacility.DoctorMapping;
 
-            _scheduleManager.RestoreSchedule(visit);
+            _scheduleManager.RestoreSchedule(visit.DoctorSchedule);
 
             if (notifyDp && visit.ForeignVisitId != null)
             {
@@ -91,7 +101,7 @@ namespace DpApiClient.Core
         {
             var visit = _visitRepository.GetByForeignId(foreignVisitId);
 
-            if(visit == null)
+            if (visit == null)
             {
                 return false;
             }
@@ -147,18 +157,20 @@ namespace DpApiClient.Core
         public Booking BookVisitDP(Visit visit, DoctorMapping mapping)
         {
             var foreignAddress = mapping.ForeignAddress;
+            var defaultDoctorService = mapping.ForeignDoctorService;
+            var visitDoctorService = visit.DoctorSchedule.ForeignDoctorService;
             var patient = visit.VisitPatient;
 
             var bookRequest = new BookSlotRequest()
             {
-                DoctorServiceId = visit.DoctorSchedule.ForeignDoctorServiceId,
+                DoctorServiceId = (visit.DoctorSchedule.ForeignDoctorService ?? defaultDoctorService).Id,
                 IsReturning = false,
                 Patient = new Patient()
                 {
                     Name = patient.Name,
                     Surname = patient.Surname,
                     BirthDate = patient.Birthdate,
-                    Email=patient.Email,
+                    Email = patient.Email,
                     Gender = patient.StrGender,
                     Nin = patient.NIN,
                     Phone = patient.Phone
@@ -183,8 +195,8 @@ namespace DpApiClient.Core
             var doctorMapping = _mappingRepo.GetByForeignAddress(address.Id);
 
             var existingVisit = _visitRepository.GetByForeignId(visitBooking.Id);
-            
-            if(existingVisit != null)
+
+            if (existingVisit != null)
             {
                 return true;
             }
@@ -199,8 +211,8 @@ namespace DpApiClient.Core
                     DoctorFacility = doctorMapping.DoctorFacility,
                     DoctorId = doctorMapping.DoctorId,
                     FacilityId = doctorMapping.FacilityId,
-                    StartAt = visitBooking.StartAt.LocalDateTime,
-                    EndAt = visitBooking.EndAt.LocalDateTime,
+                    StartAt = visitBooking.StartAt.LocalDateTime.ChangeTimeZone(timeZone),
+                    EndAt = visitBooking.EndAt.LocalDateTime.ChangeTimeZone(timeZone),
                     ForeignVisitId = visitBooking.Id,
                     VisitStatus = VisitStatus.Booked,
                     VisitPatient = new VisitPatient()
@@ -219,7 +231,7 @@ namespace DpApiClient.Core
 
                 visit.DoctorSchedule = schedule;
                 visit.DoctorScheduleId = schedule.Id;
-                
+
 
                 result = BookVisit(visit, true);
             }

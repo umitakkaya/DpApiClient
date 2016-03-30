@@ -54,6 +54,10 @@
     <Compile Include="Migrations\201603071400396_DBInit.Designer.cs">
       <DependentUpon>201603071400396_DBInit.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201603301051304_DefaultForeignDoctorService.cs" />
+    <Compile Include="Migrations\201603301051304_DefaultForeignDoctorService.Designer.cs">
+      <DependentUpon>201603301051304_DefaultForeignDoctorService.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\AppSetting.cs" />
     <Compile Include="Models\ForeignSpecialization.cs" />
     <Compile Include="Models\Specialization.cs" />
@@ -96,6 +100,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201603071400396_DBInit.resx">
       <DependentUpon>201603071400396_DBInit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201603301051304_DefaultForeignDoctorService.resx">
+      <DependentUpon>201603301051304_DefaultForeignDoctorService.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -251,11 +251,10 @@
                 }
             }
             else {
-                if (data.message)
-                {
+                if (data.message) {
                     alert(data.message);
                 }
-                
+
             }
 
         }).fail(function () {
@@ -273,13 +272,20 @@
 
         var $this = $(this);
         var action = $this.attr('action');
-        var formData = $this.serializeArray().pop();
+        var formData = $this.serializeArray();
 
-        if (formData.value) {
+        var formObject = formData.reduce(function (doctorFacility, foreignDoctorServiceId) {
+            var tmpObject = {};
+            tmpObject[doctorFacility.name] = JSON.parse(doctorFacility.value);
+            tmpObject[foreignDoctorServiceId.name] = foreignDoctorServiceId.value;
+            return tmpObject;
+        });
+
+        if (formObject) {
 
             $.post({
                 url: action,
-                data: formData.value,
+                data: JSON.stringify(formObject),
                 contentType: 'application/json; charset=utf-8'
             }).done(function (data) {
                 if (data.status === true) {

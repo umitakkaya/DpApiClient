@@ -28,3 +28,10 @@ textarea {
 {
     color: #006c0c;
 }
+
+@media (min-width: 768px) 
+{
+    .form-inline .form-control.ddl-foreign-doctor-service {
+        width: 200px;
+    }
+}

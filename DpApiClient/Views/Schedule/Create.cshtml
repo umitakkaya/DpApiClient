@@ -72,7 +72,7 @@
                     <option value="">Select doctor service</option>
                     @foreach (ForeignDoctorService item in ViewBag.ForeignDoctorServiceId)
                     {
-                        <option class="doctor-service-option" data-doctor-id="@item.DoctorId" value="@item.Id" disabled="disabled">
+                        <option class="doctor-service-option" data-doctor-id="@item.MappedDoctorId" value="@item.Id" disabled="disabled">
                             @item.Name
                         </option>
                     }

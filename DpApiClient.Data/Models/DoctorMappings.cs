@@ -10,5 +10,6 @@ namespace DpApiClient.Data
 
         public virtual DoctorFacility DoctorFacility { get; set; }
         public virtual ForeignAddress ForeignAddress { get; set; }
+        public virtual ForeignDoctorService ForeignDoctorService { get; set; }
     }
 }

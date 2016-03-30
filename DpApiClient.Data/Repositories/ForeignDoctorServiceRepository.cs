@@ -44,6 +44,15 @@ namespace DpApiClient.Data.Repositories
                 .Where(fds => ids.Contains(fds.Id));
         }
 
+        public IEnumerable<ForeignDoctorService> GetByForeignDoctorId(string foreignDoctorId)
+        {
+            return _db.ForeignDoctorServices
+                .Include(fds => fds.ForeignDoctor)
+                .Include(fds => fds.DoctorSchedules)
+                .Include(fds => fds.Visits)
+                .Where(fds => fds.ForeignDoctorId == foreignDoctorId);
+        }
+
         public void InsertOrUpdate(ForeignDoctorService entity)
         {
             ForeignDoctorService doctorService = _db.ForeignDoctorServices.AsNoTracking().SingleOrDefault(fds=> fds.Id == entity.Id);

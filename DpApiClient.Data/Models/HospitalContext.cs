@@ -10,7 +10,8 @@ namespace DpApiClient.Data
         public DbSet<Doctor> Doctors { get; set; }
         public DbSet<Facility> Facilities { get; set; }
         public DbSet<DoctorFacility> DoctorFacilities { get; set; }
-        
+        public DbSet<Specialization> Specializations { get; set; }
+
         public DbSet<DoctorSchedule> DoctorSchedules { get; set; }
         public DbSet<Visit> Visits { get; set; }
         public DbSet<VisitPatient> VisitPatients { get; set; }
@@ -27,6 +28,8 @@ namespace DpApiClient.Data
         public DbSet<ForeignFacility> ForeignFacilities { get; set; }
         public DbSet<ForeignSpecialization> ForeignSpecializations { get; set; }
         public DbSet<BookingExtraFields> BookingExtraFields { get; set; }
+
+
 
         public HospitalContext() : base("name=DefaultConnection")
         {
@@ -133,6 +136,12 @@ namespace DpApiClient.Data
                 .Map(m => m.MapKey("ForeignAddressId"))
                 .WillCascadeOnDelete(false);
 
+            modelBuilder.Entity<DoctorMapping>()
+                .HasRequired(dm => dm.ForeignDoctorService)
+                .WithOptional(fa => fa.DoctorMapping)
+                .Map(m => m.MapKey("ForeignDoctorServiceId"))
+                .WillCascadeOnDelete(false);
+
             modelBuilder.Entity<Facility>()
                 .HasMany(f => f.Branches)
                 .WithOptional(f => f.ParentFacility)
@@ -210,7 +219,5 @@ namespace DpApiClient.Data
                 .WithRequired(fs => fs.ForeignDoctor)
                 .HasForeignKey(fs => fs.ForeignDoctorId);
         }
-
-        public System.Data.Entity.DbSet<DpApiClient.Data.Specialization> Specializations { get; set; }
     }
 }

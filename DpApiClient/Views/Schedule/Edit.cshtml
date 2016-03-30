@@ -73,8 +73,8 @@
                     @foreach (ForeignDoctorService item in ViewBag.ForeignDoctorServiceId)
                     {
 
-                        <option class="doctor-service-option" data-doctor-id="@item.DoctorId" value="@item.Id" 
-                                @if (Model.DoctorId != item.DoctorId)
+                        <option class="doctor-service-option" data-doctor-id="@item.MappedDoctorId" value="@item.Id" 
+                                @if (Model.DoctorId != item.MappedDoctorId)
                                 { 
                                     @:disabled="disabled" 
                                 }

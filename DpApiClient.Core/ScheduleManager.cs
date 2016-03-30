@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DpApiClient.Core.Extensions;
 
 namespace DpApiClient.Core
 {
@@ -16,6 +17,14 @@ namespace DpApiClient.Core
         private DpApi _client;
         private VisitRepository _visitRepository;
         private ScheduleRepository _scheduleRepository;
+
+        private string timeZone
+        {
+            get
+            {
+                return ((TimeZones)AppSettings.Locale).ToString();
+            }
+        }
 
 
         public ScheduleManager(HospitalContext db, DpApi client)
@@ -43,25 +52,27 @@ namespace DpApiClient.Core
         public bool PushSlots(DoctorFacility doctorFacility)
         {
             var mapping = doctorFacility.DoctorMapping;
+            var defaultDoctorService = mapping.ForeignDoctorService;
 
-            if(mapping == null)
+            if (mapping == null)
             {
                 return false;
             }
 
-            var address= mapping.ForeignAddress;
-            var schedules = _scheduleRepository.GetByDoctorFacility(doctorFacility).Where(s=> s.ForeignDoctorServiceId != null  && s.IsFullfilled == false);
+            var address = mapping.ForeignAddress;
+            var schedules = _scheduleRepository.GetByDoctorFacility(doctorFacility).Where(s => s.IsFullfilled == false);
 
-            if(schedules.Count() == 0)
+            if (schedules.Count() == 0)
             {
                 return false;
             }
 
-            var slotRangeList = schedules.Select(s=> new SlotRange()
+            
+            var slotRangeList = schedules.Select(s => new SlotRange()
             {
-                Start = s.Date.Add(s.Start),
-                End = s.Date.Add(s.End),
-                DoctorServices = ConvertToSlotDoctorServiceList(s.ForeignDoctorService,s.Duration)
+                Start = s.Date.Add(s.Start).SetTimeZone(timeZone),
+                End = s.Date.Add(s.End).SetTimeZone(timeZone),
+                DoctorServices = ConvertToSlotDoctorServiceList(s.ForeignDoctorService ?? defaultDoctorService, s.Duration)
             }).ToList();
 
             var putSlotsRequest = new PutSlotsRequest()
@@ -131,7 +142,7 @@ namespace DpApiClient.Core
             var doctorSchedules = _scheduleRepository.GetByDateAndDoctorFacility(start, doctorFacility.DoctorId, doctorFacility.FacilityId);
 
             DoctorSchedule schedule = doctorSchedules.FirstOrDefault(ds =>
-                    ds.Start <= start.TimeOfDay  && end.TimeOfDay <= ds.End
+                    ds.Start <= start.TimeOfDay && end.TimeOfDay <= ds.End
                     &&
                     ds.ForeignDoctorServiceId == foreignDoctorServiceId
                 );
@@ -144,11 +155,8 @@ namespace DpApiClient.Core
             return schedule;
         }
 
-        public DoctorSchedule RestoreSchedule(Visit visit)
+        public DoctorSchedule RestoreSchedule(DoctorSchedule schedule)
         {
-
-            var schedule = visit.DoctorSchedule;
-
             schedule.IsFullfilled = false;
             _scheduleRepository.Update(schedule);
             _scheduleRepository.Save();
@@ -183,13 +191,13 @@ namespace DpApiClient.Core
                 }
                 else if (visitStart > doctorSchedule.Start && visitEnd < doctorSchedule.End)
                 {
-                    var remainingSchedule = DivideSchedule(doctorSchedule, visitStart, visitEnd);    
+                    var remainingSchedule = DivideSchedule(doctorSchedule, visitStart, visitEnd);
 
                     if (remainingSchedule != null)
                     {
                         _scheduleRepository.Insert(remainingSchedule);
                     }
-                    
+
                     _scheduleRepository.Update(doctorSchedule);
                 }
                 else

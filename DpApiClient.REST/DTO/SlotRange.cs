@@ -9,7 +9,7 @@ namespace DpApiClient.REST.DTO
 {
     public class SlotRange : Slot
     {
-        public DateTime End { get; set; }
+        public DateTimeOffset End { get; set; }
 
         public List<SlotDoctorService> DoctorServices { get; set; }
     }

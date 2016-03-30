@@ -143,6 +143,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\DoctorView.cs" />
+    <Compile Include="ViewModels\MappingViewModel.cs" />
     <Compile Include="ViewModels\NewVisit.cs" />
   </ItemGroup>
   <ItemGroup>
