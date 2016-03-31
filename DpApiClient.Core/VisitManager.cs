@@ -8,7 +8,7 @@ using DpApiClient.Data;
 using DpApiClient.REST.Client;
 using DpApiClient.Data.Repositories;
 using DpApiClient.REST.DTO;
-using DpApiClient.Core.Extensions;
+using DpApiClient.REST.Extensions;
 
 namespace DpApiClient.Core
 {

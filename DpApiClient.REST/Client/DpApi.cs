@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using DpApiClient.REST.Extensions;
 
 namespace DpApiClient.REST.Client
 {
@@ -27,6 +28,8 @@ namespace DpApiClient.REST.Client
 
         private RestClient _client;
 
+        private Locale _locale;
+
         /// <summary>
         /// Initialize Docplanner REST Client
         /// </summary>
@@ -39,6 +42,7 @@ namespace DpApiClient.REST.Client
             ClientSecret = clientSecret;
 
             _client = new RestClient(locale.ToString());
+            _locale = locale;
 
             SetSerializerStrategy();
             GetToken();
@@ -390,7 +394,8 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         private string EncodeUniversalString(DateTime dt)
         {
-            return HttpUtility.UrlEncode(dt.ToString("o"));
+            string timeZone = ((TimeZones)_locale).ToString();
+            return HttpUtility.UrlEncode(dt.SetTimeZone(timeZone).ToString("o"));
         }
 
         /// <summary>

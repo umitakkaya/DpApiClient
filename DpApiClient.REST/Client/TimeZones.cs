@@ -42,5 +42,19 @@ namespace DpApiClient.REST.Client
             }
         }
 
+        public static explicit operator TimeZones(Locale locale)
+        {
+            TimeZones result;
+            string localeName = locale.GetValue();
+            if (instance.TryGetValue(localeName, out result))
+            {
+                return result;
+            }
+            else
+            {
+                throw new InvalidCastException();
+            }
+        }
+
     }
 }

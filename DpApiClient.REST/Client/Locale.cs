@@ -24,6 +24,11 @@ namespace DpApiClient.REST.Client
             instance[value] = this;
         }
 
+        public string GetValue()
+        {
+            return _value;
+        }
+
         public override string ToString()
         {
             return _name;

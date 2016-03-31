@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DpApiClient.Core.Extensions
+namespace DpApiClient.REST.Extensions
 {
     public static class DateTimeExtensions
     {
