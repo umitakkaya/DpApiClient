@@ -137,9 +137,15 @@ namespace DpApiClient.Data
                 .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<DoctorMapping>()
-                .HasRequired(dm => dm.ForeignDoctorService)
-                .WithOptional(fa => fa.DoctorMapping)
-                .Map(m => m.MapKey("ForeignDoctorServiceId"))
+               .HasRequired(dm => dm.ForeignDoctorService)
+               .WithMany(fds => fds.DoctorMappings)
+               .HasForeignKey(dm => dm.ForeignDoctorServiceId)
+               .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<ForeignDoctorService>()
+                .HasMany(fds => fds.DoctorMappings)
+                .WithRequired(dm => dm.ForeignDoctorService)
+                .HasForeignKey(dm => dm.ForeignDoctorServiceId)
                 .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Facility>()

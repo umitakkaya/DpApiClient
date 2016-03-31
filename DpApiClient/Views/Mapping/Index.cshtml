@@ -17,7 +17,7 @@
             Foreign Doctor
         </th>
         <th>
-            Foreign Facility
+            Foreign Facility - Doctor service
         </th>
         <th>
             Doctor
@@ -42,6 +42,10 @@
                     @Html.DisplayFor(modelItem => address.Name) -
                     @Html.DisplayFor(modelItem => address.Street)
                 </div>
+                @if (address.IsMapped)
+                {
+                    <div>@Html.DisplayFor(modelItem => address.DoctorMapping.ForeignDoctorService.Name)</div>
+                }
             </td>
             @if (address.IsMapped)
             {
@@ -52,6 +56,7 @@
                     @Html.DisplayFor(modelItem => address.DoctorMapping.DoctorFacility.Facility.Name)
                 </td>
                 <td>
+                    
                     <div class="clearfix">
                         <div class="btn-group" role="group" aria-label="Mapping actions">
                             <button type="button" class="btn btn-success btn-sm btn-remote"
