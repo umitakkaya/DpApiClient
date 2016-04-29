@@ -80,7 +80,14 @@ namespace DpApiClient.Core
 
         private bool SlotBookedEvent(DPFacility facility, DPDoctor doctor, Address address, Booking visitBooking)
         {
-            return _visitManager.RegisterDpVisit(facility, doctor, address, visitBooking);
+            bool result = _visitManager.RegisterDpVisit(facility, doctor, address, visitBooking);
+
+            if (result == false)
+            {
+                _visitManager.CancelVisitDP(facility.Id, doctor.Id, address.Id, visitBooking.Id);
+            }
+
+            return result;
         }
 
         private bool DefaultEventHandler(DPFacility facility, DPDoctor doctor, Address address)

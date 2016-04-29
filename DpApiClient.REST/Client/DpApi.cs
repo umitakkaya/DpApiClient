@@ -118,7 +118,7 @@ namespace DpApiClient.REST.Client
 
             //remove duplicates
             //When two address for the same facility assigned to the same doctor, duplication happens.
-            var items = response.Data.Items.GroupBy(d=>d.Id).Select(d=>d.First()).ToList();
+            var items = response.Data.Items.GroupBy(d => d.Id).Select(d => d.First()).ToList();
 
             return items;
         }
@@ -197,7 +197,7 @@ namespace DpApiClient.REST.Client
 
 
             request.AddQueryParameter("address_id", addressId);
-            request.AddQueryParameter("start", EncodeUniversalString(start));
+            request.AddQueryParameter("start", EncodeUniversalString(start, false));
 
             var response = _client.Execute<DPCollection<DoctorService>>(request);
 
@@ -276,8 +276,8 @@ namespace DpApiClient.REST.Client
         {
             var request = new RestRequest($"{Prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/slots", Method.GET);
 
-            request.AddQueryParameter("start", EncodeUniversalString(start));
-            request.AddQueryParameter("end", EncodeUniversalString(end));
+            request.AddParameter("start", EncodeUniversalString(start, false), ParameterType.QueryString);
+            request.AddParameter("end", EncodeUniversalString(end, false), ParameterType.QueryString);
 
             var response = _client.Execute<DPCollection<Slot>>(request);
 
@@ -362,8 +362,8 @@ namespace DpApiClient.REST.Client
         {
             var request = new RestRequest($"{Prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/bookings", Method.GET);
 
-            request.AddQueryParameter("start", EncodeUniversalString(start));
-            request.AddQueryParameter("end", EncodeUniversalString(end));
+            request.AddParameter("start", EncodeUniversalString(start, false), ParameterType.QueryString);
+            request.AddParameter("end", EncodeUniversalString(end, false), ParameterType.QueryString);
 
             var response = _client.Execute<DPCollection<Booking>>(request);
 
@@ -392,11 +392,20 @@ namespace DpApiClient.REST.Client
         /// </summary>
         /// <param name="dt"></param>
         /// <returns></returns>
-        private string EncodeUniversalString(DateTime dt)
+        private string EncodeUniversalString(DateTime dt, bool urlEncode = true)
         {
             string timeZone = ((TimeZones)_locale).ToString();
-            return HttpUtility.UrlEncode(dt.SetTimeZone(timeZone).ToString("o"));
+
+            if (urlEncode)
+            {
+                return HttpUtility.UrlEncode(dt.SetOffset(timeZone).ToString("yyyy-MM-ddTHH:mm:sszzz"));
+            }
+            else
+            {
+                return dt.SetOffset(timeZone).ToString("yyyy-MM-ddTHH:mm:sszzz");
+            }
         }
+
 
         /// <summary>
         /// Tells the serializer to use snake_case when serializing JSON
@@ -412,7 +421,7 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         private AuthorizationToken GetToken()
         {
-            var request = new RestRequest(TokenEndpoint , Method.POST);
+            var request = new RestRequest(TokenEndpoint, Method.POST);
 
             request.AddParameter("client_id", ClientId);
             request.AddParameter("client_secret", ClientSecret);

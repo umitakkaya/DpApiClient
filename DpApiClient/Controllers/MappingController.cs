@@ -76,6 +76,7 @@ namespace DpApiClient.Controllers
             var mapping = repo.GetByForeignAddress(id);
             try
             {
+                bool clearResult = scheduleManager.ClearDPCalendar(mapping.DoctorFacility);
                 bool result = scheduleManager.PushSlots(mapping.DoctorFacility);
                 return Json(new { status = result });
             }

@@ -9,7 +9,7 @@ namespace DpApiClient.Core
 {
     public static class AppSettings
     {
-        private static HospitalContext _db = new HospitalContext();
+        private static HospitalContext _db;
 
         private static string _clientId;
         private static string _clientSecret;
@@ -19,7 +19,7 @@ namespace DpApiClient.Core
         {
             get
             {
-
+                SetupContext();
                 return _clientId ?? (_clientId = _db.AppSettings.Single(s => s.SettingName == "dpapi.clientId").SettingValue);
             }
         }
@@ -28,6 +28,7 @@ namespace DpApiClient.Core
         {
             get
             {
+                SetupContext();
                 return _clientSecret ?? (_clientSecret = _db.AppSettings.Single(s => s.SettingName == "dpapi.clientSecret").SettingValue);
             }
         }
@@ -36,7 +37,16 @@ namespace DpApiClient.Core
         {
             get
             {
+                SetupContext();
                 return _locale ?? (_locale = _db.AppSettings.Single(s => s.SettingName == "dpapi.locale").SettingValue);
+            }
+        }
+
+        private static void SetupContext()
+        {
+            if(_db == null)
+            {
+                 _db = new HospitalContext();
             }
         }
     }

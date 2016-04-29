@@ -301,7 +301,7 @@
 
         }
         else {
-
+            alert('Form is empty please check the form');
         }
     });
 })();

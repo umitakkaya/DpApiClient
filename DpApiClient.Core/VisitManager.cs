@@ -51,12 +51,14 @@ namespace DpApiClient.Core
         {
 
             var visit = _visitRepository.GetByForeignId(oldVisit.Id);
+            var newStart = newVisit.StartAt.LocalDateTime.ChangeTimeZone(timeZone);
+            var newEnd = newVisit.EndAt.LocalDateTime.ChangeTimeZone(timeZone);
 
-            if (_scheduleManager.IsSlotExist(newVisit.StartAt.LocalDateTime.ChangeTimeZone(timeZone), newVisit.EndAt.LocalDateTime.ChangeTimeZone(timeZone), visit.DoctorFacility))
+            if (_scheduleManager.IsSlotExist(newStart, newEnd, visit.DoctorFacility))
             {
                 visit.ForeignVisitId = newVisit.Id;
-                visit.StartAt = newVisit.StartAt.LocalDateTime.ChangeTimeZone(timeZone);
-                visit.EndAt = newVisit.EndAt.LocalDateTime.ChangeTimeZone(timeZone);
+                visit.StartAt = newStart;
+                visit.EndAt = newEnd;
 
                 var oldSchedule = visit.DoctorSchedule;
                 var newSchedule = _scheduleManager.FindDoctorSchedule(visit.DoctorFacility, visit.StartAt, visit.EndAt, newVisit.Service.Id);
@@ -229,11 +231,18 @@ namespace DpApiClient.Core
 
                 var schedule = _scheduleManager.FindDoctorSchedule(doctorMapping.DoctorFacility, visit.StartAt, visit.EndAt, visitBooking.Service.Id);
 
-                visit.DoctorSchedule = schedule;
-                visit.DoctorScheduleId = schedule.Id;
+                if(schedule == null)
+                {
+                    result = false;
+                }
+                else
+                {
+                    visit.DoctorSchedule = schedule;
+                    visit.DoctorScheduleId = schedule.Id;
 
 
-                result = BookVisit(visit, true);
+                    result = BookVisit(visit, true);
+                }
             }
 
             return result;

@@ -70,8 +70,8 @@ namespace DpApiClient.Core
             
             var slotRangeList = schedules.Select(s => new SlotRange()
             {
-                Start = s.Date.Add(s.Start).SetTimeZone(timeZone),
-                End = s.Date.Add(s.End).SetTimeZone(timeZone),
+                Start = s.Date.Add(s.Start).SetOffset(timeZone),
+                End = s.Date.Add(s.End).SetOffset(timeZone),
                 DoctorServices = ConvertToSlotDoctorServiceList(s.ForeignDoctorService ?? defaultDoctorService, s.Duration)
             }).ToList();
 
@@ -81,6 +81,45 @@ namespace DpApiClient.Core
             };
 
             return _client.PutSlots(address.ForeignFacilityId, address.ForeignDoctorId, address.Id, putSlotsRequest);
+        }
+
+        /// <summary>
+        /// Delete all slots on Docplanner side
+        /// </summary>
+        /// <param name="doctorFacility"></param>
+        /// <returns></returns>
+        public bool ClearDPCalendar(DoctorFacility doctorFacility)
+        {
+            var mapping = doctorFacility.DoctorMapping;
+
+            if (mapping == null)
+            {
+                return false;
+            }
+
+            var address = mapping.ForeignAddress;
+
+
+            var startDate = TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now);
+            var endDate = startDate.Date.AddMonths(3); // 3 because you can put slots only for the next 3 months
+
+            
+            var slots = _client.GetSlots(address.ForeignFacilityId, address.ForeignDoctorId, address.Id, startDate, endDate);
+
+            //If there aren't any slots there is nothing to do.
+            if (slots == null || slots.Any() == false)
+            {
+                return true;
+            }
+
+            //Clear slots for the dates which has slots.
+            //No need to send request for the days which don't have any slots.
+            foreach (var item in slots.GroupBy(s => s.Start.Date))
+            {
+                _client.DeleteSlots(address.ForeignFacilityId, address.ForeignDoctorId, address.Id, item.Key);
+            }
+
+            return true;
         }
 
 

@@ -34,6 +34,15 @@ namespace DpApiClient.Data.Repositories
                 .Include(df => df.DoctorMapping);
         }
 
+        public IEnumerable<DoctorFacility> GetMapped()
+        {
+            return _db.DoctorFacilities
+                .Include(df => df.Doctor)
+                .Include(df => df.Facility)
+                .Include(df => df.DoctorMapping)
+                .Where(df => df.DoctorMapping != null);
+        }
+
         public IEnumerable<DoctorFacility> GetNotMapped()
         {
             return _db.DoctorFacilities

@@ -74,6 +74,7 @@
     <Compile Include="DTO\SlotRange.cs" />
     <Compile Include="DTO\Specialization.cs" />
     <Compile Include="Extensions\DateTimeExtensions.cs" />
+    <Compile Include="Extensions\DateTimeOffsetExtensions.cs" />
     <Compile Include="Utilities\SnakeCaseContractResolver.cs" />
     <Compile Include="Utilities\SnakeJsonSerializerStrategy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
