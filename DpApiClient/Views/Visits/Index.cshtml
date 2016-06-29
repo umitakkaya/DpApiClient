@@ -61,7 +61,7 @@
                 @Html.DisplayFor(modelItem => item.ForeignVisitId)
             </td>
             <td>
-                @if (item.VisitStatus != DpApiClient.Data.VisitStatus.Cancelled)
+                @if (item.VisitStatus != DpApiClient.Data.VisitStatus.Cancelled && item.StartAt > DateTime.Now)
                 {
                     <button type="button" class="btn btn-danger btn-sm btn-remote"
                             data-url="@Url.Action("Cancel", new { id = item.Id })"

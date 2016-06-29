@@ -67,9 +67,15 @@ namespace DpApiClient.Controllers
                 visit.StartAt = visit.DoctorSchedule.Date.Add(visit.StartAt.TimeOfDay);
                 visit.EndAt = visit.DoctorSchedule.Date.Add(visit.EndAt.TimeOfDay);
 
-                _visitManager.BookVisit(visit);
-
-                return RedirectToAction("Index");
+                try
+                {
+                    _visitManager.BookVisit(visit);
+                    return RedirectToAction("Index");
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("form", ex.Message);
+                }
             }
 
             ViewBag.FacilityId = new SelectList(_doctorFacilityRepo.GetAllFacilities(), "Id", "Name");
@@ -112,10 +118,15 @@ namespace DpApiClient.Controllers
         public ActionResult Cancel(int id)
         {
             Visit visit = _repo.GetById(id);
-            _visitManager.CancelVisit(visit);
-
-
-            return Json(new { status = true });
+            try
+            {
+                 _visitManager.CancelVisit(visit);
+                return Json(new { status = true });
+            }
+            catch (ArgumentException ex)
+            {
+                return Json(new { status = false, message = ex.Message });
+            }
         }
 
         protected override void Dispose(bool disposing)

@@ -77,8 +77,8 @@ namespace DpApiClient.Controllers
             try
             {
                 bool clearResult = scheduleManager.ClearDPCalendar(mapping.DoctorFacility);
-                bool result = scheduleManager.PushSlots(mapping.DoctorFacility);
-                return Json(new { status = result });
+                bool pushResult = scheduleManager.PushSlots(mapping.DoctorFacility);
+                return Json(new { status = pushResult && clearResult });
             }
             catch (Exception ex)
             {

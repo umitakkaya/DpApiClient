@@ -44,9 +44,9 @@ namespace DpApiClient.Core
 
         private static void SetupContext()
         {
-            if(_db == null)
+            if (_db == null)
             {
-                 _db = new HospitalContext();
+                _db = new HospitalContext();
             }
         }
     }

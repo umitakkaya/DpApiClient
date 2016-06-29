@@ -1,4 +1,5 @@
-﻿using DpApiClient.Data;
+﻿using Common.Logging;
+using DpApiClient.Data;
 using DpApiClient.Data.Repositories;
 using DpApiClient.REST.Client;
 using Quartz;
@@ -13,6 +14,8 @@ namespace DpApiClient.Core.Worker
 {
     public class SynchronizeSchedulesJob : IJob
     {
+        private static readonly ILog log = LogManager.GetLogger(typeof(SynchronizeSchedulesJob));
+
         public void Execute(IJobExecutionContext context)
         {
             var db = new HospitalContext();
@@ -28,8 +31,8 @@ namespace DpApiClient.Core.Worker
                 bool clearResult = scheduleManager.ClearDPCalendar(item);
                 bool pushResult = scheduleManager.PushSlots(item);
 
-                Console.WriteLine("Cleaning slot result: {0}", clearResult);
-                Console.WriteLine("Push slot result: {0}", pushResult);
+                log.Warn($"Cleaning slot result: {clearResult}");
+                log.Warn($"Push slot result: {pushResult}");
             }
 
             repo.Dispose();

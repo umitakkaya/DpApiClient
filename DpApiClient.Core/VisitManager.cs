@@ -83,6 +83,11 @@ namespace DpApiClient.Core
 
         public bool CancelVisit(Visit visit, bool notifyDp = true)
         {
+            if(visit.StartAt <= DateTime.Now)
+            {
+                throw new ArgumentException("You can't cancel a visit which is in the past");
+            }
+
             visit.VisitStatus = VisitStatus.Cancelled;
             _visitRepository.Save();
 
@@ -131,28 +136,41 @@ namespace DpApiClient.Core
             return true;
         }
 
-        public bool BookVisit(Visit visit, bool isDpVisit = false)
+        public void BookVisit(Visit visit, bool isDpVisit = false)
         {
-            var mapping = visit.DoctorFacility.DoctorMapping;
-
-            _visitRepository.Insert(visit);
-            _visitRepository.Save();
-
-            _scheduleManager.ArrangeSchedule(visit);
-
-
-            if (mapping == null || isDpVisit)
+            using (var transaction = _db.Database.BeginTransaction())
             {
-                return true;
-            }
-            else
-            {
-                var booking = BookVisitDP(visit, mapping);
+                try
+                {
+                    var mapping = visit.DoctorFacility.DoctorMapping;
 
-                visit.ForeignVisitId = booking.Id;
-                _visitRepository.Save();
+                    if (visit.StartAt <= DateTime.Now)
+                    {
+                        throw new ArgumentException("You can't book a visit which is in the past");
+                    }
 
-                return true;
+
+                    _visitRepository.Insert(visit);
+                    _visitRepository.Save();
+
+                    _scheduleManager.ArrangeSchedule(visit);
+
+
+                    if (mapping != null && isDpVisit == false)
+                    {
+                        var booking = BookVisitDP(visit, mapping);
+
+                        visit.ForeignVisitId = booking.Id;
+                        _visitRepository.Save();
+                    }
+
+                    transaction.Commit();
+                }
+                catch (Exception)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
             }
         }
 
@@ -193,59 +211,61 @@ namespace DpApiClient.Core
 
         public bool RegisterDpVisit(DPFacility facility, DPDoctor doctor, Address address, Booking visitBooking)
         {
-            bool result = false;
             var doctorMapping = _mappingRepo.GetByForeignAddress(address.Id);
-
             var existingVisit = _visitRepository.GetByForeignId(visitBooking.Id);
+            var startAt = visitBooking.StartAt.LocalDateTime.ChangeTimeZone(timeZone);
+            var endAt = visitBooking.EndAt.LocalDateTime.ChangeTimeZone(timeZone);
 
             if (existingVisit != null)
             {
                 return true;
             }
-
-
-            if (doctorMapping != null)
+            else if (false == _scheduleManager.IsSlotExist(startAt, endAt, doctorMapping.DoctorFacility))
             {
-                var patient = visitBooking.Patient;
-
-                var visit = new Visit()
-                {
-                    DoctorFacility = doctorMapping.DoctorFacility,
-                    DoctorId = doctorMapping.DoctorId,
-                    FacilityId = doctorMapping.FacilityId,
-                    StartAt = visitBooking.StartAt.LocalDateTime.ChangeTimeZone(timeZone),
-                    EndAt = visitBooking.EndAt.LocalDateTime.ChangeTimeZone(timeZone),
-                    ForeignVisitId = visitBooking.Id,
-                    VisitStatus = VisitStatus.Booked,
-                    VisitPatient = new VisitPatient()
-                    {
-                        Name = patient.Name,
-                        Surname = patient.Surname,
-                        Phone = patient.Phone,
-                        Email = patient.Email,
-                        Gender = patient.Gender == null ? Gender.NotSpecified : (patient.Gender == "m" ? Gender.Male : Gender.Female),
-                        NIN = patient.Nin,
-                        Birthdate = patient.BirthDate
-                    }
-                };
-
-                var schedule = _scheduleManager.FindDoctorSchedule(doctorMapping.DoctorFacility, visit.StartAt, visit.EndAt, visitBooking.Service.Id);
-
-                if(schedule == null)
-                {
-                    result = false;
-                }
-                else
-                {
-                    visit.DoctorSchedule = schedule;
-                    visit.DoctorScheduleId = schedule.Id;
-
-
-                    result = BookVisit(visit, true);
-                }
+                return false;
+            }
+            else if (doctorMapping == null)
+            {
+                return false;
             }
 
-            return result;
+            var patient = visitBooking.Patient;
+            var visit = new Visit()
+            {
+                DoctorFacility = doctorMapping.DoctorFacility,
+                DoctorId = doctorMapping.DoctorId,
+                FacilityId = doctorMapping.FacilityId,
+                StartAt = visitBooking.StartAt.LocalDateTime.ChangeTimeZone(timeZone),
+                EndAt = visitBooking.EndAt.LocalDateTime.ChangeTimeZone(timeZone),
+                ForeignVisitId = visitBooking.Id,
+                VisitStatus = VisitStatus.Booked,
+                VisitPatient = new VisitPatient()
+                {
+
+                    Name = patient.Name,
+                    Surname = patient.Surname,
+                    Phone = patient.Phone,
+                    Email = patient.Email,
+                    Gender = patient.Gender == null ? Gender.NotSpecified : (patient.Gender == "m" ? Gender.Male : Gender.Female),
+                    NIN = patient.Nin,
+                    Birthdate = patient.BirthDate
+                }
+            };
+
+
+            var schedule = _scheduleManager.FindDoctorSchedule(doctorMapping.DoctorFacility, visit.StartAt, visit.EndAt, visitBooking.Service.Id);
+            if (schedule == null || schedule.IsFullfilled)
+            {
+                return false;
+            }
+            else
+            {
+                visit.DoctorSchedule = schedule;
+                visit.DoctorScheduleId = schedule.Id;
+
+                BookVisit(visit, true);
+                return true;
+            }
         }
     }
 }

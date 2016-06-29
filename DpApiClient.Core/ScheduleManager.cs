@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DpApiClient.REST.Extensions;
+using System.Data.Entity;
+using System.Globalization;
 
 namespace DpApiClient.Core
 {
@@ -52,35 +54,52 @@ namespace DpApiClient.Core
         public bool PushSlots(DoctorFacility doctorFacility)
         {
             var mapping = doctorFacility.DoctorMapping;
-            var defaultDoctorService = mapping.ForeignDoctorService;
 
             if (mapping == null)
             {
                 return false;
             }
 
-            var address = mapping.ForeignAddress;
-            var schedules = _scheduleRepository.GetByDoctorFacility(doctorFacility).Where(s => s.IsFullfilled == false);
+            var maxSlotDate = CultureInfo.InvariantCulture.Calendar.AddWeeks(DateTime.Now, 12);
+            var schedules = _scheduleRepository
+                .GetByDoctorFacility(doctorFacility)
+                .Where(s => s.IsFullfilled == false &&
+                    s.Start < s.End &&
+                    s.Date.Add(s.Start) > DateTime.Now &&
+                    s.Date.Add(s.End) < maxSlotDate);
 
             if (schedules.Count() == 0)
             {
                 return false;
             }
 
-            
-            var slotRangeList = schedules.Select(s => new SlotRange()
-            {
-                Start = s.Date.Add(s.Start).SetOffset(timeZone),
-                End = s.Date.Add(s.End).SetOffset(timeZone),
-                DoctorServices = ConvertToSlotDoctorServiceList(s.ForeignDoctorService ?? defaultDoctorService, s.Duration)
-            }).ToList();
+            var result = true;
+            var address = mapping.ForeignAddress;
+            var groupedSchedules = schedules.GroupBy(s => s.Date.Date);
+            var defaultDoctorService = mapping.ForeignDoctorService;
 
-            var putSlotsRequest = new PutSlotsRequest()
+            foreach (var item in groupedSchedules)
             {
-                Slots = slotRangeList
-            };
 
-            return _client.PutSlots(address.ForeignFacilityId, address.ForeignDoctorId, address.Id, putSlotsRequest);
+                var putSlotsRequest = new PutSlotsRequest()
+                {
+                    Slots = item.Select(s => new SlotRange()
+                    {
+                        Start          = s.Date.Add(s.Start).SetOffset(timeZone),
+                        End            = s.Date.Add(s.End).SetOffset(timeZone),
+                        DoctorServices = ConvertToSlotDoctorServiceList(s.ForeignDoctorService ?? defaultDoctorService, s.Duration)
+                    }).ToList()
+                };
+
+                bool pushResult = _client.PutSlots(address.ForeignFacilityId, address.ForeignDoctorId, address.Id, putSlotsRequest);
+
+                if (false == pushResult)
+                {
+                    result = false;
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -203,7 +222,7 @@ namespace DpApiClient.Core
             return schedule;
         }
 
-        public List<DoctorSchedule> ArrangeSchedule(Visit visit)
+        public void ArrangeSchedule(Visit visit)
         {
             var doctorSchedule = visit.DoctorSchedule;
             TimeSpan slot = new TimeSpan(0, doctorSchedule.Duration, 0);
@@ -247,8 +266,6 @@ namespace DpApiClient.Core
 
             _scheduleRepository.Update(doctorSchedule);
             _scheduleRepository.Save();
-
-            return new List<DoctorSchedule>();
         }
 
         private DoctorSchedule CreateVisitSchedule(DoctorSchedule schedule, Visit visit, TimeSpan visitStart, TimeSpan visitEnd)
@@ -291,6 +308,5 @@ namespace DpApiClient.Core
                 }
             };
         }
-
     }
 }
