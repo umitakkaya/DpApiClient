@@ -10,7 +10,7 @@ namespace DpApiClient.Data
 
         public virtual string Fullname
         {
-            get { return $"{Name} {Surname}"; }
+            get { return string.Concat(Name, " ", Surname); }
         }
 
         private List<ForeignSpecialization> _foreignSpecializations;

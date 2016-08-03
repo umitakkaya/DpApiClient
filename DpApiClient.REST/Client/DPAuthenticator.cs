@@ -21,8 +21,8 @@ namespace DpApiClient.REST.Client
 
         public void Authenticate(IRestClient client, IRestRequest request)
         {
-            client.AddDefaultHeader("Authorization", $"Bearer {AuthorizationToken.AccessToken}");
-            
+            client.AddDefaultHeader("Authorization", string.Concat("Bearer ", AuthorizationToken.AccessToken));
+
         }
     }
 }

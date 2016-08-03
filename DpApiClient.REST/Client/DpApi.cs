@@ -21,14 +21,29 @@ namespace DpApiClient.REST.Client
         private const string TokenEndpoint = "oauth/v2/token";
         private const string Prefix = "api/v2/integration";
 
-        public string ClientId { get; set; }
-        public string ClientSecret { get; set; }
-        public string GrantType { get; set; } = "client_credentials";
-        public string Scope { get; set; } = "integration";
+        
+
+        private string _grantType = "client_credentials";
+        private string _scope = "integration";
 
         private RestClient _client;
 
         private Locale _locale;
+
+
+        public string ClientId { get; set; }
+        public string ClientSecret { get; set; }
+        public string GrantType
+        {
+            get { return _grantType; }
+            set { _grantType = value; }
+        }
+
+        public string Scope
+        {
+            get { return _scope; }
+            set { _scope = value; }
+        }
 
         /// <summary>
         /// Initialize Docplanner REST Client
@@ -57,7 +72,8 @@ namespace DpApiClient.REST.Client
         /// <see cref="DoctorService"/>
         public List<Service> GetServices()
         {
-            var request = new RestRequest($"{Prefix}/services", Method.GET);
+            var request = new RestRequest("{prefix}/services", Method.GET);
+            request.AddUrlSegment("prefix", Prefix);
 
             var response = _client.Execute<DPCollection<Service>>(request);
 
@@ -66,7 +82,8 @@ namespace DpApiClient.REST.Client
 
         public Notification GetNotification()
         {
-            var request = new RestRequest($"{Prefix}/notifications", Method.GET);
+            var request = new RestRequest("{prefix}/notifications", Method.GET);
+            request.AddUrlSegment("prefix", Prefix);
 
             var response = _client.Execute<Notification>(request);
 
@@ -79,7 +96,8 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public List<DPFacility> GetFacilities()
         {
-            var request = new RestRequest($"{Prefix}/facilities", Method.GET);
+            var request = new RestRequest("{prefix}/facilities", Method.GET);
+            request.AddUrlSegment("prefix", Prefix);
 
             var response = _client.Execute<DPCollection<DPFacility>>(request);
 
@@ -93,7 +111,9 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public DPFacility GetFacility(int facilityId)
         {
-            var request = new RestRequest($"{Prefix}/facilities/{facilityId}", Method.GET);
+            var request = new RestRequest("{prefix}/facilities/{facilityId}", Method.GET);
+            request.AddUrlSegment("prefix", Prefix);
+            request.AddUrlSegment("faciliyId", facilityId.ToString());
 
             var response = _client.Execute<DPFacility>(request);
 
@@ -107,7 +127,9 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public List<DPDoctor> GetDoctors(string facilityId, bool shouldIncludeSpecializations = false)
         {
-            var request = new RestRequest($"{Prefix}/facilities/{facilityId}/doctors", Method.GET);
+            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors", Method.GET);
+            request.AddUrlSegment("prefix", Prefix);
+            request.AddUrlSegment("faciliyId", facilityId.ToString());
 
             if (shouldIncludeSpecializations)
             {
@@ -131,7 +153,10 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public DPDoctor GetDoctor(string facilityId, string doctorId)
         {
-            var request = new RestRequest($"{Prefix}/facilities/{facilityId}/doctors/{doctorId}", Method.GET);
+            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}", Method.GET);
+            request.AddUrlSegment("prefix", Prefix);
+            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            request.AddUrlSegment("doctorId", doctorId.ToString());
 
             var response = _client.Execute<DPDoctor>(request);
 
@@ -146,7 +171,10 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public List<Address> GetAddresses(string facilityId, string doctorId)
         {
-            var request = new RestRequest($"{Prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses", Method.GET);
+            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses", Method.GET);
+            request.AddUrlSegment("prefix", Prefix);
+            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            request.AddUrlSegment("doctorId", doctorId.ToString());
 
             var response = _client.Execute<DPCollection<Address>>(request);
 
@@ -161,7 +189,11 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public Address GetAddress(string facilityId, string doctorId, string addressId)
         {
-            var request = new RestRequest($"{Prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}", Method.GET);
+            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}", Method.GET);
+            request.AddUrlSegment("prefix", Prefix);
+            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            request.AddUrlSegment("doctorId", doctorId.ToString());
+            request.AddUrlSegment("addressId", addressId.ToString());
 
             var response = _client.Execute<Address>(request);
 
@@ -176,7 +208,10 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public List<DoctorService> GetDoctorServices(string facilityId, string doctorId)
         {
-            var request = new RestRequest($"{Prefix}/facilities/{facilityId}/doctors/{doctorId}/services", Method.GET);
+            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/services", Method.GET);
+            request.AddUrlSegment("prefix", Prefix);
+            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            request.AddUrlSegment("doctorId", doctorId.ToString());
 
             var response = _client.Execute<DPCollection<DoctorService>>(request);
 
@@ -193,8 +228,10 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public List<DoctorService> GetDoctorServices(string facilityId, string doctorId, string addressId, DateTime start)
         {
-            var request = new RestRequest($"{Prefix}/facilities/{facilityId}/doctors/{doctorId}/services", Method.GET);
-
+            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/services", Method.GET);
+            request.AddUrlSegment("prefix", Prefix);
+            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            request.AddUrlSegment("doctorId", doctorId.ToString());
 
             request.AddQueryParameter("address_id", addressId);
             request.AddQueryParameter("start", EncodeUniversalString(start, false));
@@ -213,7 +250,11 @@ namespace DpApiClient.REST.Client
         /// <returns>true if deletion is successfull</returns>
         public bool DeleteDoctorService(string facilityId, string doctorId, int doctorServiceId)
         {
-            var request = new RestRequest($"{Prefix}/facilities/{facilityId}/doctors/{doctorId}/services/{doctorServiceId}", Method.DELETE);
+            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/services/{doctorServiceId}", Method.DELETE);
+            request.AddUrlSegment("prefix", Prefix);
+            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            request.AddUrlSegment("doctorId", doctorId.ToString());
+            request.AddUrlSegment("doctorServiceId", doctorServiceId.ToString());
 
             var response = _client.Execute(request);
 
@@ -231,7 +272,10 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public DoctorService CreateDoctorService(string facilityId, string doctorId, string serviceId, double? priceMin, double? priceMax)
         {
-            var request = new RestRequest($"{Prefix}/facilities/{facilityId}/doctors/{doctorId}/services", Method.POST);
+            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/services", Method.POST);
+            request.AddUrlSegment("prefix", Prefix);
+            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            request.AddUrlSegment("doctorId", doctorId.ToString());
 
             request.AddParameter("service_id", serviceId, ParameterType.RequestBody);
             request.AddParameter("price_min", priceMin, ParameterType.RequestBody);
@@ -253,7 +297,11 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public DoctorService UpdateDoctorService(string facilityId, string doctorId, string doctorServiceId, double? priceMin, double? priceMax)
         {
-            var request = new RestRequest($"{Prefix}/facilities/{facilityId}/doctors/{doctorId}/services/{doctorServiceId}", Method.PATCH);
+            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/services/{doctorServiceId}", Method.PATCH);
+            request.AddUrlSegment("prefix", Prefix);
+            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            request.AddUrlSegment("doctorId", doctorId.ToString());
+            request.AddUrlSegment("doctorServiceId", doctorServiceId.ToString());
 
             request.AddParameter("price_min", priceMin, ParameterType.RequestBody);
             request.AddParameter("price_max", priceMax, ParameterType.RequestBody);
@@ -274,7 +322,11 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public List<Slot> GetSlots(string facilityId, string doctorId, string addressId, DateTime start, DateTime end)
         {
-            var request = new RestRequest($"{Prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/slots", Method.GET);
+            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/slots", Method.GET);
+            request.AddUrlSegment("prefix", Prefix);
+            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            request.AddUrlSegment("doctorId", doctorId.ToString());
+            request.AddUrlSegment("addressId", addressId.ToString());
 
             request.AddParameter("start", EncodeUniversalString(start, false), ParameterType.QueryString);
             request.AddParameter("end", EncodeUniversalString(end, false), ParameterType.QueryString);
@@ -297,9 +349,14 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public Booking BookSlot(string facilityId, string doctorId, string addressId, DateTime start, BookSlotRequest bookSlotRequest)
         {
-            var request = new RestRequest($"{Prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/slots/{EncodeUniversalString(start)}/book", Method.POST);
-            request.AddJsonBody(bookSlotRequest);
+            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/slots/{start}/book", Method.POST);
+            request.AddUrlSegment("prefix", Prefix);
+            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            request.AddUrlSegment("doctorId", doctorId.ToString());
+            request.AddUrlSegment("addressId", addressId.ToString());
+            request.AddUrlSegment("start", EncodeUniversalString(start));
 
+            request.AddJsonBody(bookSlotRequest);
 
             var response = _client.Execute<Booking>(request);
 
@@ -317,7 +374,11 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public bool PutSlots(string facilityId, string doctorId, string addressId, PutSlotsRequest putSlotsRequest)
         {
-            var request = new RestRequest($"{Prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/slots", Method.PUT);
+            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/slots", Method.PUT);
+            request.AddUrlSegment("prefix", Prefix);
+            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            request.AddUrlSegment("doctorId", doctorId.ToString());
+            request.AddUrlSegment("addressId", addressId.ToString());
 
             request.AddJsonBody(putSlotsRequest);
 
@@ -342,7 +403,12 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public bool DeleteSlots(string facilityId, string doctorId, string addressId, DateTime start)
         {
-            var request = new RestRequest($"{Prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/slots/{start.ToString("yyyy-MM-dd")}", Method.DELETE);
+            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/slots/{start}", Method.DELETE);
+            request.AddUrlSegment("prefix", Prefix);
+            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            request.AddUrlSegment("doctorId", doctorId.ToString());
+            request.AddUrlSegment("addressId", addressId.ToString());
+            request.AddUrlSegment("start", start.ToString("yyyy-MM-dd"));
 
             var response = _client.Execute(request);
 
@@ -360,7 +426,11 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public List<Booking> GetBookings(string facilityId, string doctorId, string addressId, DateTime start, DateTime end)
         {
-            var request = new RestRequest($"{Prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/bookings", Method.GET);
+            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/bookings", Method.GET);
+            request.AddUrlSegment("prefix", Prefix);
+            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            request.AddUrlSegment("doctorId", doctorId.ToString());
+            request.AddUrlSegment("addressId", addressId.ToString());
 
             request.AddParameter("start", EncodeUniversalString(start, false), ParameterType.QueryString);
             request.AddParameter("end", EncodeUniversalString(end, false), ParameterType.QueryString);
@@ -380,7 +450,12 @@ namespace DpApiClient.REST.Client
         /// <returns>true if the booking was canceled successfully</returns>
         public bool CancelBooking(string facilityId, string doctorId, string addressId, string bookingId)
         {
-            var request = new RestRequest($"{Prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/bookings/{bookingId}", Method.DELETE);
+            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/bookings/{bookingId}", Method.DELETE);
+            request.AddUrlSegment("prefix", Prefix);
+            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            request.AddUrlSegment("doctorId", doctorId.ToString());
+            request.AddUrlSegment("addressId", addressId.ToString());
+            request.AddUrlSegment("bookingId", bookingId.ToString());
 
             var response = _client.Execute(request);
 

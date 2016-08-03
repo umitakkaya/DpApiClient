@@ -9,9 +9,33 @@ namespace DpApiClient.ViewModels
     public partial class DoctorView
     {
         public Doctor Doctor { get; set; }
-        public List<Facility> Facilities { get; set; } = new List<Facility>();
-        public List<Specialization> Specializations { get; set; } = new List<Specialization>();
-        public int[] SelectedFacilityIds { get; set; } = new int[0];
-        public int[] SelectedSpecializationIds { get; set; } = new int[0];
+
+        private List<Facility> _facilities = new List<Facility>();
+        public List<Facility> Facilities
+        {
+            get { return _facilities; }
+            set { _facilities = value; }
+        }
+
+        private List<Specialization> _specializations = new List<Specialization>();
+        public List<Specialization> Specializations
+        {
+            get { return _specializations; }
+            set { _specializations = value; }
+        }
+
+        private int[] _selectedFacilityIds = new int[0];
+        public int[] SelectedFacilityIds
+        {
+            get { return _selectedFacilityIds; }
+            set { _selectedFacilityIds = value; }
+        }
+
+        private int[] _selectedSpecializationIds = new int[0];
+        public int[] SelectedSpecializationIds
+        {
+            get { return _selectedSpecializationIds; }
+            set { _selectedSpecializationIds = value; }
+        }
     }
 }

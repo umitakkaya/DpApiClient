@@ -33,7 +33,7 @@ namespace DpApiClient.Core
             foreach (var facility in facilities)
             {
 
-                Console.WriteLine($"IMPORTING FACILITY: {facility.Name}\n");
+                Console.WriteLine("IMPORTING FACILITY: {0}\n", facility.Name);
                 var foreignFacility = new ForeignFacility()
                 {
                     Id = facility.Id,
@@ -47,7 +47,7 @@ namespace DpApiClient.Core
                 Console.WriteLine("DOCTORS:");
                 foreach (var dpDoctor in dpDoctors)
                 {
-                    Console.WriteLine($"-> {dpDoctor.Name} {dpDoctor.Surname} (ID:{dpDoctor.Id})");
+                    Console.WriteLine("-> {0} {1} (ID:{2})", dpDoctor.Name, dpDoctor.Surname, dpDoctor.Id);
 
                     var foreignDoctor = TransformForeignDoctor(dpDoctor);
                     var dpDoctorSpecialization = client.GetDoctor(facility.Id, dpDoctor.Id);

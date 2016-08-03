@@ -41,7 +41,7 @@ namespace DpApiClient.Data
             TimeSpan difference = End - Start;
             if(difference.TotalMinutes < Duration)
             {
-                yield return new ValidationResult($"Duration must be less than or equal to the time range", new[] { "Duration", "Start", "End" });
+                yield return new ValidationResult("Duration must be less than or equal to the time range", new[] { "Duration", "Start", "End" });
             }
         }
     }

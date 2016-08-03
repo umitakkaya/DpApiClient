@@ -31,8 +31,8 @@ namespace DpApiClient.Core.Worker
                 bool clearResult = scheduleManager.ClearDPCalendar(item);
                 bool pushResult = scheduleManager.PushSlots(item);
 
-                log.Warn($"Cleaning slot result: {clearResult}");
-                log.Warn($"Push slot result: {pushResult}");
+                log.Warn("Cleaning slot result: " + clearResult.ToString());
+                log.Warn("Push slot result: " + pushResult.ToString());
             }
 
             repo.Dispose();
