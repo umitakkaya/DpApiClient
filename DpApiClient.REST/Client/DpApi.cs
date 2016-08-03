@@ -19,8 +19,6 @@ namespace DpApiClient.REST.Client
     public class DpApi
     {
         private const string TokenEndpoint = "oauth/v2/token";
-        private const string Prefix = "api/v2/integration";
-
         
 
         private string _grantType = "client_credentials";
@@ -72,8 +70,8 @@ namespace DpApiClient.REST.Client
         /// <see cref="DoctorService"/>
         public List<Service> GetServices()
         {
-            var request = new RestRequest("{prefix}/services", Method.GET);
-            request.AddUrlSegment("prefix", Prefix);
+            var request = new RestRequest("api/v2/integration/services", Method.GET);
+            
 
             var response = _client.Execute<DPCollection<Service>>(request);
 
@@ -82,8 +80,8 @@ namespace DpApiClient.REST.Client
 
         public Notification GetNotification()
         {
-            var request = new RestRequest("{prefix}/notifications", Method.GET);
-            request.AddUrlSegment("prefix", Prefix);
+            var request = new RestRequest("api/v2/integration/notifications", Method.GET);
+            
 
             var response = _client.Execute<Notification>(request);
 
@@ -96,8 +94,8 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public List<DPFacility> GetFacilities()
         {
-            var request = new RestRequest("{prefix}/facilities", Method.GET);
-            request.AddUrlSegment("prefix", Prefix);
+            var request = new RestRequest("api/v2/integration/facilities", Method.GET);
+            
 
             var response = _client.Execute<DPCollection<DPFacility>>(request);
 
@@ -111,9 +109,9 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public DPFacility GetFacility(int facilityId)
         {
-            var request = new RestRequest("{prefix}/facilities/{facilityId}", Method.GET);
-            request.AddUrlSegment("prefix", Prefix);
-            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            var request = new RestRequest("api/v2/integration/facilities/{facilityId}", Method.GET);
+            
+            request.AddUrlSegment("facilityId", facilityId.ToString());
 
             var response = _client.Execute<DPFacility>(request);
 
@@ -127,9 +125,9 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public List<DPDoctor> GetDoctors(string facilityId, bool shouldIncludeSpecializations = false)
         {
-            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors", Method.GET);
-            request.AddUrlSegment("prefix", Prefix);
-            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            var request = new RestRequest("api/v2/integration/facilities/{facilityId}/doctors", Method.GET);
+            
+            request.AddUrlSegment("facilityId", facilityId.ToString());
 
             if (shouldIncludeSpecializations)
             {
@@ -153,9 +151,9 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public DPDoctor GetDoctor(string facilityId, string doctorId)
         {
-            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}", Method.GET);
-            request.AddUrlSegment("prefix", Prefix);
-            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            var request = new RestRequest("api/v2/integration/facilities/{facilityId}/doctors/{doctorId}", Method.GET);
+            
+            request.AddUrlSegment("facilityId", facilityId.ToString());
             request.AddUrlSegment("doctorId", doctorId.ToString());
 
             var response = _client.Execute<DPDoctor>(request);
@@ -171,9 +169,9 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public List<Address> GetAddresses(string facilityId, string doctorId)
         {
-            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses", Method.GET);
-            request.AddUrlSegment("prefix", Prefix);
-            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            var request = new RestRequest("api/v2/integration/facilities/{facilityId}/doctors/{doctorId}/addresses", Method.GET);
+            
+            request.AddUrlSegment("facilityId", facilityId.ToString());
             request.AddUrlSegment("doctorId", doctorId.ToString());
 
             var response = _client.Execute<DPCollection<Address>>(request);
@@ -189,9 +187,9 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public Address GetAddress(string facilityId, string doctorId, string addressId)
         {
-            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}", Method.GET);
-            request.AddUrlSegment("prefix", Prefix);
-            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            var request = new RestRequest("api/v2/integration/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}", Method.GET);
+            
+            request.AddUrlSegment("facilityId", facilityId.ToString());
             request.AddUrlSegment("doctorId", doctorId.ToString());
             request.AddUrlSegment("addressId", addressId.ToString());
 
@@ -208,9 +206,9 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public List<DoctorService> GetDoctorServices(string facilityId, string doctorId)
         {
-            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/services", Method.GET);
-            request.AddUrlSegment("prefix", Prefix);
-            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            var request = new RestRequest("api/v2/integration/facilities/{facilityId}/doctors/{doctorId}/services", Method.GET);
+            
+            request.AddUrlSegment("facilityId", facilityId.ToString());
             request.AddUrlSegment("doctorId", doctorId.ToString());
 
             var response = _client.Execute<DPCollection<DoctorService>>(request);
@@ -228,9 +226,9 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public List<DoctorService> GetDoctorServices(string facilityId, string doctorId, string addressId, DateTime start)
         {
-            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/services", Method.GET);
-            request.AddUrlSegment("prefix", Prefix);
-            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            var request = new RestRequest("api/v2/integration/facilities/{facilityId}/doctors/{doctorId}/services", Method.GET);
+            
+            request.AddUrlSegment("facilityId", facilityId.ToString());
             request.AddUrlSegment("doctorId", doctorId.ToString());
 
             request.AddQueryParameter("address_id", addressId);
@@ -250,9 +248,9 @@ namespace DpApiClient.REST.Client
         /// <returns>true if deletion is successfull</returns>
         public bool DeleteDoctorService(string facilityId, string doctorId, int doctorServiceId)
         {
-            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/services/{doctorServiceId}", Method.DELETE);
-            request.AddUrlSegment("prefix", Prefix);
-            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            var request = new RestRequest("api/v2/integration/facilities/{facilityId}/doctors/{doctorId}/services/{doctorServiceId}", Method.DELETE);
+            
+            request.AddUrlSegment("facilityId", facilityId.ToString());
             request.AddUrlSegment("doctorId", doctorId.ToString());
             request.AddUrlSegment("doctorServiceId", doctorServiceId.ToString());
 
@@ -272,9 +270,9 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public DoctorService CreateDoctorService(string facilityId, string doctorId, string serviceId, double? priceMin, double? priceMax)
         {
-            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/services", Method.POST);
-            request.AddUrlSegment("prefix", Prefix);
-            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            var request = new RestRequest("api/v2/integration/facilities/{facilityId}/doctors/{doctorId}/services", Method.POST);
+            
+            request.AddUrlSegment("facilityId", facilityId.ToString());
             request.AddUrlSegment("doctorId", doctorId.ToString());
 
             request.AddParameter("service_id", serviceId, ParameterType.RequestBody);
@@ -297,9 +295,9 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public DoctorService UpdateDoctorService(string facilityId, string doctorId, string doctorServiceId, double? priceMin, double? priceMax)
         {
-            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/services/{doctorServiceId}", Method.PATCH);
-            request.AddUrlSegment("prefix", Prefix);
-            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            var request = new RestRequest("api/v2/integration/facilities/{facilityId}/doctors/{doctorId}/services/{doctorServiceId}", Method.PATCH);
+            
+            request.AddUrlSegment("facilityId", facilityId.ToString());
             request.AddUrlSegment("doctorId", doctorId.ToString());
             request.AddUrlSegment("doctorServiceId", doctorServiceId.ToString());
 
@@ -322,9 +320,9 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public List<Slot> GetSlots(string facilityId, string doctorId, string addressId, DateTime start, DateTime end)
         {
-            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/slots", Method.GET);
-            request.AddUrlSegment("prefix", Prefix);
-            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            var request = new RestRequest("api/v2/integration/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/slots", Method.GET);
+            
+            request.AddUrlSegment("facilityId", facilityId.ToString());
             request.AddUrlSegment("doctorId", doctorId.ToString());
             request.AddUrlSegment("addressId", addressId.ToString());
 
@@ -349,9 +347,9 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public Booking BookSlot(string facilityId, string doctorId, string addressId, DateTime start, BookSlotRequest bookSlotRequest)
         {
-            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/slots/{start}/book", Method.POST);
-            request.AddUrlSegment("prefix", Prefix);
-            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            var request = new RestRequest("api/v2/integration/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/slots/{start}/book", Method.POST);
+            
+            request.AddUrlSegment("facilityId", facilityId.ToString());
             request.AddUrlSegment("doctorId", doctorId.ToString());
             request.AddUrlSegment("addressId", addressId.ToString());
             request.AddUrlSegment("start", EncodeUniversalString(start));
@@ -374,9 +372,9 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public bool PutSlots(string facilityId, string doctorId, string addressId, PutSlotsRequest putSlotsRequest)
         {
-            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/slots", Method.PUT);
-            request.AddUrlSegment("prefix", Prefix);
-            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            var request = new RestRequest("api/v2/integration/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/slots", Method.PUT);
+            
+            request.AddUrlSegment("facilityId", facilityId.ToString());
             request.AddUrlSegment("doctorId", doctorId.ToString());
             request.AddUrlSegment("addressId", addressId.ToString());
 
@@ -403,9 +401,9 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public bool DeleteSlots(string facilityId, string doctorId, string addressId, DateTime start)
         {
-            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/slots/{start}", Method.DELETE);
-            request.AddUrlSegment("prefix", Prefix);
-            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            var request = new RestRequest("api/v2/integration/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/slots/{start}", Method.DELETE);
+            
+            request.AddUrlSegment("facilityId", facilityId.ToString());
             request.AddUrlSegment("doctorId", doctorId.ToString());
             request.AddUrlSegment("addressId", addressId.ToString());
             request.AddUrlSegment("start", start.ToString("yyyy-MM-dd"));
@@ -426,9 +424,9 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         public List<Booking> GetBookings(string facilityId, string doctorId, string addressId, DateTime start, DateTime end)
         {
-            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/bookings", Method.GET);
-            request.AddUrlSegment("prefix", Prefix);
-            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            var request = new RestRequest("api/v2/integration/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/bookings", Method.GET);
+            
+            request.AddUrlSegment("facilityId", facilityId.ToString());
             request.AddUrlSegment("doctorId", doctorId.ToString());
             request.AddUrlSegment("addressId", addressId.ToString());
 
@@ -450,9 +448,9 @@ namespace DpApiClient.REST.Client
         /// <returns>true if the booking was canceled successfully</returns>
         public bool CancelBooking(string facilityId, string doctorId, string addressId, string bookingId)
         {
-            var request = new RestRequest("{prefix}/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/bookings/{bookingId}", Method.DELETE);
-            request.AddUrlSegment("prefix", Prefix);
-            request.AddUrlSegment("faciliyId", facilityId.ToString());
+            var request = new RestRequest("api/v2/integration/facilities/{facilityId}/doctors/{doctorId}/addresses/{addressId}/bookings/{bookingId}", Method.DELETE);
+            
+            request.AddUrlSegment("facilityId", facilityId.ToString());
             request.AddUrlSegment("doctorId", doctorId.ToString());
             request.AddUrlSegment("addressId", addressId.ToString());
             request.AddUrlSegment("bookingId", bookingId.ToString());
