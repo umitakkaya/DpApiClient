@@ -12,6 +12,7 @@ namespace DpApiClient.REST.DTO
         public Address Address { get; set; }
         public DPDoctor Doctor { get; set; }
         public Booking VisitBooking { get; set; }
+        public RealtimeBooking VisitBookingRequest { get; set; }
         public Booking OldVisitBooking { get; set; }
         public Booking NewVisitBooking { get; set; }
     }

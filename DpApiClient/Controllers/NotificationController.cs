@@ -10,6 +10,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Newtonsoft.Json;
+using System.Net;
 
 namespace DpApiClient.Controllers
 {
@@ -45,17 +46,25 @@ namespace DpApiClient.Controllers
 
             Notification notification = JsonConvert.DeserializeObject<Notification>(json, settings);
 
-            HandleNotification(notification);
-            return Json(new { status = true, echo = json });
+            bool result = HandleNotification(notification);
+
+            if(result)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.NoContent);
+            }
+            
+            return new HttpStatusCodeResult(HttpStatusCode.NotAcceptable);
         }
 
-        private void HandleNotification(Notification notification)
+        private bool HandleNotification(Notification notification)
         {
             if (notification != null && notification.Message == null)
             {
                 NotificationHandler handler = new NotificationHandler(_client);
-                handler.HandleNotification(notification);
+                return handler.HandleNotification(notification);
             }
+
+            return false;
         }
     }
 }

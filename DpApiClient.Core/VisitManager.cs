@@ -209,6 +209,20 @@ namespace DpApiClient.Core
             }
         }
 
+        public bool CanSlotBeBooked(DPFacility facility, DPDoctor doctor, Address address, RealtimeBooking visitBooking)
+        {
+            var doctorMapping = _mappingRepo.GetByForeignAddress(address.Id);
+            var startAt = visitBooking.StartAt.LocalDateTime.ChangeTimeZone(timeZone);
+            var endAt = visitBooking.EndAt.LocalDateTime.ChangeTimeZone(timeZone);
+
+            if (doctorMapping == null)
+            {
+                return false;
+            }
+
+            return _scheduleManager.IsSlotExist(startAt, endAt, doctorMapping.DoctorFacility);
+        }
+
         public bool RegisterDpVisit(DPFacility facility, DPDoctor doctor, Address address, Booking visitBooking)
         {
             var doctorMapping = _mappingRepo.GetByForeignAddress(address.Id);
