@@ -41,7 +41,8 @@ namespace DpApiClient.Core
             {
                 case "slot-booked":
                     return SlotBookedEvent(notification.Data.Facility, notification.Data.Doctor, notification.Data.Address, notification.Data.VisitBooking);
-
+                case "slot-booking":
+                    return SlotBookingEvent(notification.Data.Facility, notification.Data.Doctor, notification.Data.Address, notification.Data.VisitBookingRequest);
                 case "booking-canceled":
                     return BookingCanceled(notification.Data.Facility, notification.Data.Doctor, notification.Data.Address, notification.Data.VisitBooking);
                 case "booking-moved":
@@ -88,6 +89,11 @@ namespace DpApiClient.Core
             }
 
             return result;
+        }
+
+        private bool SlotBookingEvent(DPFacility facility, DPDoctor doctor, Address address, RealtimeBooking visitBooking)
+        {
+            return _visitManager.CanSlotBeBooked(facility, doctor, address, visitBooking);
         }
 
         private bool DefaultEventHandler(DPFacility facility, DPDoctor doctor, Address address)
