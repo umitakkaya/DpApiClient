@@ -98,14 +98,7 @@ namespace DpApiClient.Core
 
         private bool DefaultEventHandler(DPFacility facility, DPDoctor doctor, Address address)
         {
-            var mapping = _mappingRepo.GetByForeignAddress(address.Id);
-            if (mapping == null)
-            {
-                return false;
-            }
-
             return true;
-            //noop
         }
 
     }
