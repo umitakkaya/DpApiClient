@@ -6,9 +6,6 @@
 
 <h2>Doctors</h2>
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
 <table class="table">
     <tr>
         <th>
@@ -16,7 +13,6 @@
         </th>
         <th>Facilities</th>
         <th>Specializations</th>
-        <th></th>
     </tr>
 
 @foreach (var item in Model) {
@@ -26,11 +22,6 @@
         </td>
         <td>@String.Join(", ", item.DoctorFacilities.Select(f => f.Facility.Name))</td>
         <td>@String.Join(", ", item.Specializations.Select(s => s.Name))</td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
-        </td>
     </tr>
 }
 
