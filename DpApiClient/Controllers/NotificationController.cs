@@ -52,8 +52,13 @@ namespace DpApiClient.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.NoContent);
             }
-            
-            return new HttpStatusCodeResult(HttpStatusCode.NotAcceptable);
+
+            if(notification.Name == "slot-booking")
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.Conflict); 
+            }
+
+            return Json(new { status = result, echo = json, message = "Notification was either already processed or not necessarily needed" });
         }
 
         private bool HandleNotification(Notification notification)
