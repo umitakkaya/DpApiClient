@@ -157,9 +157,10 @@ namespace DpApiClient.Core
                 DateTime dtStart = schedule.Date.Add(start);
                 DateTime dtEnd = dtStart;
 
+                int duration = RoundToNearestFive(schedule.Duration);
+
                 do
                 {
-
                     dtEnd = dtStart.AddMinutes(schedule.Duration);
 
                     slots.Add(new VisitSlot()
@@ -299,6 +300,8 @@ namespace DpApiClient.Core
 
         private List<SlotDoctorService> ConvertToSlotDoctorServiceList(ForeignDoctorService doctorService, int duration)
         {
+            duration = RoundToNearestFive(duration);
+
             return new List<SlotDoctorService>()
             {
                 new SlotDoctorService()
@@ -307,6 +310,11 @@ namespace DpApiClient.Core
                     Duration = duration
                 }
             };
+        }
+
+        private int RoundToNearestFive(int number)
+        {
+            return 5 * (int)Math.Round(number / 5.0);
         }
     }
 }
