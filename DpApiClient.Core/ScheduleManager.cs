@@ -161,7 +161,7 @@ namespace DpApiClient.Core
 
                 do
                 {
-                    dtEnd = dtStart.AddMinutes(schedule.Duration);
+                    dtEnd = dtStart.AddMinutes(duration);
 
                     slots.Add(new VisitSlot()
                     {
@@ -171,9 +171,9 @@ namespace DpApiClient.Core
                         DoctorFacility = schedule.DoctorFacility
                     });
 
-                    dtStart = dtStart.AddMinutes(schedule.Duration);
+                    dtStart = dtStart.AddMinutes(duration);
 
-                } while (dtEnd.AddMinutes(schedule.Duration).TimeOfDay <= end);
+                } while (dtEnd.AddMinutes(duration).TimeOfDay <= end);
             }
 
             return slots;
