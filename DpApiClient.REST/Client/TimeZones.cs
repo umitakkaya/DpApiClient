@@ -14,7 +14,7 @@ namespace DpApiClient.REST.Client
         private static readonly Dictionary<string, TimeZones> instance = new Dictionary<string, TimeZones>();
 
 
-        public static readonly TimeZones TR = new TimeZones("tr-TR", "GTB Standard Time");
+        public static readonly TimeZones TR = new TimeZones("tr-TR", "Turkey Standard Time");
         public static readonly TimeZones PL = new TimeZones("pl-PL", "Central European Standard Time");
 
         public TimeZones(string value, string name)
