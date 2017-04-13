@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Client\DPPutSlotException.cs" />
+    <Compile Include="Client\Globals.cs" />
     <Compile Include="Client\TimeZones.cs" />
     <Compile Include="Client\Locale.cs" />
     <Compile Include="DTO\RealtimeBooking.cs" />
