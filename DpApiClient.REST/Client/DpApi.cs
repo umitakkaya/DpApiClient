@@ -494,18 +494,25 @@ namespace DpApiClient.REST.Client
         /// <returns></returns>
         private AuthorizationToken GetToken()
         {
-            var request = new RestRequest(TokenEndpoint, Method.POST);
+            var token = Globals.GetToken(ClientId);
+            if (token == null || token.ExpiresAt <= DateTime.Now)
+            {
+                var request = new RestRequest(TokenEndpoint, Method.POST);
 
-            request.AddParameter("client_id", ClientId);
-            request.AddParameter("client_secret", ClientSecret);
-            request.AddParameter("grant_type", GrantType);
-            request.AddParameter("scope", Scope);
+                request.AddParameter("client_id", ClientId);
+                request.AddParameter("client_secret", ClientSecret);
+                request.AddParameter("grant_type", GrantType);
+                request.AddParameter("scope", Scope);
 
-            var tokenResponse = _client.Post<AuthorizationToken>(request);
+                var tokenResponse = _client.Post<AuthorizationToken>(request);
 
-            _client.Authenticator = new DPAuthenticator(tokenResponse.Data);
+                token = tokenResponse.Data;
 
-            return tokenResponse.Data;
+                Globals.SetToken(ClientId, token);
+            }
+
+            _client.Authenticator = new DPAuthenticator(token);
+            return token;
         }
 
         /// <summary>
