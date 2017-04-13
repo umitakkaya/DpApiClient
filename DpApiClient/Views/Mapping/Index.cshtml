@@ -1,0 +1,131 @@
+﻿@using DpApiClient.Data
+@using DpApiClient.ViewModels
+@model MappingViewModel
+
+@{
+    ViewBag.Title = "Doctor mappings";
+}
+
+<h2>Doctor Mapping</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            Foreign Doctor
+        </th>
+        <th>
+            Foreign Facility - Doctor service
+        </th>
+        <th>
+            Doctor
+        </th>
+        <th>
+            Facility
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (ForeignAddress address in Model.ForeignAddresses)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => address.ForeignDoctor.Fullname)
+            </td>
+            <td>
+                <div>
+                    @Html.DisplayFor(modelItem => address.ForeignFacility.Name)
+                </div>
+                <div>
+                    @Html.DisplayFor(modelItem => address.Name) -
+                    @Html.DisplayFor(modelItem => address.Street)
+                </div>
+                @if (address.IsMapped)
+                {
+                    <div>@Html.DisplayFor(modelItem => address.DoctorMapping.ForeignDoctorService.Name)</div>
+                }
+            </td>
+            @if (address.IsMapped)
+            {
+                <td>
+                    @Html.DisplayFor(modelItem => address.DoctorMapping.DoctorFacility.Doctor.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => address.DoctorMapping.DoctorFacility.Facility.Name)
+                </td>
+                <td>
+                    
+                    <div class="clearfix">
+                        <div class="btn-group" role="group" aria-label="Mapping actions">
+                            <button type="button" class="btn btn-success btn-sm btn-remote"
+                                    data-address-id="@address.Id"
+                                    data-url="@Url.Action("Sync", new { id = address.Id })"
+                                    data-method="POST"
+                                    data-loading-text="Syncing...">
+                                <i class="glyphicon glyphicon-retweet"></i>
+                                Sync
+                            </button>
+
+                            <button type="button" class="btn btn-danger btn-sm btn-remote"
+                                    data-address-id="@address.Id"
+                                    data-url="@Url.Action("Delete", new { id = address.Id })"
+                                    data-method="POST"
+                                    data-behaviour="reload"
+                                    data-loading-text="Loading...">
+                                <i class="glyphicon glyphicon-minus"></i>
+                                Remove Mapping
+                            </button>
+                        </div>
+                    </div>
+                </td>
+            }
+            else
+            {
+                <td colspan="3">
+                    <div class="clearfix">
+                        <form action="@Url.Action("Map", new { id= address.Id })" method="POST" class="frm-map form-inline">
+                            <div class="form-group">
+                                <select name="DoctorFacility" class="form-control ddl-doctor-facility" data-address-id="@address.Id" required>
+                                    <option value="">Select doctor facility group</option>
+                                    @foreach (DoctorFacility item in Model.DoctorFacilities)
+                                    {
+                                        <option value='@Json.Encode(new { DoctorId = item.DoctorId, FacilityId = item.FacilityId })'>
+                                            @item.Doctor.Name - @item.Facility.Name
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <select name="foreignDoctorServiceId" class="form-control ddl-foreign-doctor-service" required>
+                                    <option value="">Select doctor service</option>
+                                    @foreach (ForeignDoctorService item in Model.ForeignDoctorServices.Where(fds => fds.ForeignDoctorId == address.ForeignDoctorId))
+                                    {
+                                        <option value='@item.Id'>@item.Name</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <button data-address-id="@address.Id" class="btn btn-sm btn-primary btn-map">
+                                <i class="glyphicon glyphicon-resize-small"></i>
+                                Map
+                            </button>
+
+                        </form>
+                    </div>
+                </td>
+            }
+        </tr>
+    }
+
+</table>
+
+
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/custom")
+}

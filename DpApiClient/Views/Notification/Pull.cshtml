@@ -1,0 +1,47 @@
+﻿@model DpApiClient.REST.DTO.Notification
+@{
+    ViewBag.Title = "Pull Notification";
+}
+
+<h2>Pulled Notification</h2>
+
+@if(Model.Data != null)
+{
+
+
+<h3>
+    Notification type: @Model.Name
+</h3>
+<dl>
+    <dt>
+        Doctor:
+    </dt>
+    <dd>
+        <div>
+            Foreign ID: @Model.Data.Doctor.Id
+        </div>
+        @Model.Data.Doctor.Name @Model.Data.Doctor.Surname
+
+    </dd>
+    <dt>
+        Foreign Facility:
+    </dt>
+    <dd>
+        @Model.Data.Facility
+    </dd>
+
+    <dt>
+        Address:
+    </dt>
+    <dd>
+        @Model.Data.Address
+        <div>
+            @Model.Data.Address.Street - @Model.Data.Address.PostCode
+        </div>
+    </dd>
+</dl>
+}
+else
+{
+    <h4>No notification found</h4>
+}

@@ -1,0 +1,84 @@
+﻿@model IEnumerable<DpApiClient.Data.Visit>
+
+@{
+    ViewBag.Title = "Visits";
+}
+
+<h2>Visits</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            Doctor
+        </th>
+        <th>
+            Start - End
+        </th>
+        <th>
+            Patient
+        </th>
+        <th>
+            Status
+        </th>
+        <th>
+            DP Visit ID
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.DoctorFacility.Doctor.Name)
+            </td>
+            <td>
+                <div>@Html.DisplayFor(modelItem => item.StartAt)</div>
+                <div>
+                    @Html.DisplayFor(modelItem => item.EndAt)
+                </div>
+
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.VisitPatient.Name) @Html.DisplayFor(modelItem => item.VisitPatient.Surname) (@Html.DisplayFor(modelItem => item.VisitPatient.NIN))
+                <div>
+                    Phone: @Html.DisplayFor(modelItem => item.VisitPatient.Phone)
+                </div>
+                <div>
+                    Email: @Html.DisplayFor(modelItem => item.VisitPatient.Email)
+                </div>
+                <div>
+                    Birthdate: @Html.DisplayFor(modelItem => item.VisitPatient.Birthdate)
+                </div>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.VisitStatus)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ForeignVisitId)
+            </td>
+            <td>
+                @if (item.VisitStatus != DpApiClient.Data.VisitStatus.Cancelled && item.StartAt > DateTime.Now)
+                {
+                    <button type="button" class="btn btn-danger btn-sm btn-remote"
+                            data-url="@Url.Action("Cancel", new { id = item.Id })"
+                            data-method="POST"
+                            data-behaviour="reload"
+                            data-loading-text="Cancelling...">
+                        <i class="glyphicon glyphicon-minus"></i>
+                        Cancel
+                    </button>
+                }
+            </td>
+        </tr>
+    }
+
+</table>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/custom")
+}

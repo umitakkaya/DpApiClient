@@ -1,0 +1,75 @@
+﻿@model IEnumerable<DpApiClient.Data.DoctorSchedule>
+
+@{
+    ViewBag.Title = "Schedules";
+}
+
+<h2>Schedules</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            Doctor 
+        </th>
+        <th>
+            Facility
+        </th>
+        <th>
+            Foreign doctor service
+        </th>
+        <th>
+            Full
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Duration)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Start)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.End)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Date)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.DoctorFacility.Doctor.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.DoctorFacility.Facility.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ForeignDoctorService.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IsFullfilled)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Duration)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Start)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.End)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Date)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
+            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+        </td>
+    </tr>
+}
+
+</table>
