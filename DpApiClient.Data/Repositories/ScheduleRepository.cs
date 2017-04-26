@@ -54,6 +54,20 @@ namespace DpApiClient.Data.Repositories
                     ds.Date == DbFunctions.TruncateTime(date)
                 );
         }
+        
+        
+        public IEnumerable<DoctorSchedule> GetByDateAndDoctorFacilityAsNoTracking(DateTime date, int doctorId, int facilityId)
+        {
+            return _db.DoctorSchedules
+                .AsNoTracking()
+                .Include(ds => ds.DoctorFacility)
+                .Include(ds => ds.ForeignDoctorService)
+                .Where(ds =>
+                    ds.DoctorId == doctorId && ds.FacilityId == facilityId
+                    &&
+                    ds.Date == DbFunctions.TruncateTime(date)
+                );
+        }
 
         public IEnumerable<DoctorSchedule> GetByDate(DateTime date)
         {
