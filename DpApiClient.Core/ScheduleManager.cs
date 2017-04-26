@@ -1,4 +1,4 @@
-﻿using DpApiClient.Data;
+using DpApiClient.Data;
 using DpApiClient.Data.Repositories;
 using DpApiClient.REST.Client;
 using DpApiClient.REST.DTO;
@@ -144,7 +144,7 @@ namespace DpApiClient.Core
 
         public List<VisitSlot> GetSlots(DateTime date, DoctorFacility doctorFacility)
         {
-            var doctorSchedules = _scheduleRepository.GetByDateAndDoctorFacility(date, doctorFacility.DoctorId, doctorFacility.FacilityId)
+            var doctorSchedules = _scheduleRepository.GetByDateAndDoctorFacilityAsNoTracking(date, doctorFacility.DoctorId, doctorFacility.FacilityId)
                 .Where(ds => !ds.IsFullfilled);
 
             var slots = new List<VisitSlot>();
