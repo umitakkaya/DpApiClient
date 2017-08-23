@@ -76,7 +76,7 @@ namespace DpApiClient.Data.Repositories
         public void Update(ForeignSpecialization entity)
         {
             _db.ForeignSpecializations.Attach(entity);
-            _db.Entry(entity);
+            _db.Entry(entity).State = EntityState.Modified;
         }
 
         public void Dispose()

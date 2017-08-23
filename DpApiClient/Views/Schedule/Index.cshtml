@@ -1,75 +1,95 @@
 ﻿@model IEnumerable<DpApiClient.Data.DoctorSchedule>
-
 @{
     ViewBag.Title = "Schedules";
 }
-
 <h2>Schedules</h2>
-
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
-<table class="table">
-    <tr>
-        <th>
-            Doctor 
-        </th>
-        <th>
-            Facility
-        </th>
-        <th>
-            Foreign doctor service
-        </th>
-        <th>
-            Full
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Duration)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Start)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.End)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Date)
-        </th>
-        <th></th>
-    </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.DoctorFacility.Doctor.Name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.DoctorFacility.Facility.Name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ForeignDoctorService.Name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.IsFullfilled)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Duration)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Start)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.End)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Date)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
-        </td>
-    </tr>
-}
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+    @foreach (var item in Model.GroupBy(s => s.DoctorFacility))
+    {
+        var sectionId = string.Format("{0}_{1}", @item.Key.DoctorId, @item.Key.FacilityId);
 
-</table>
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="heading-@item.Key.DoctorId-@item.Key.FacilityId">
+                <h4 class="panel-title">
+                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-@sectionId" aria-expanded="true" aria-controls="collapse-@sectionId">
+                        @item.Key.Doctor.Name - @item.Key.Facility.Name
+                    </a>
+                </h4>
+            </div>
+            <div id="collapse-@sectionId" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-@sectionId">
+                <div class="panel-body">
+                    <div class="panel-group" id="accordion-@sectionId" role="tablist" aria-multiselectable="true">
+                        @foreach (var schedules in item.GroupBy(s => s.Date))
+                        {
+                            int index = 0;
+                            <div class="panel panel-default">
+
+                                <div class="panel-heading" role="tab" id="heading-@sectionId-@schedules.Key.ToString("yyyyMMdd")">
+                                    <h4 class="panel-title">
+                                        <a role="button" data-toggle="collapse" data-parent="#accordion-@sectionId" href="#schedules-@sectionId-@schedules.Key.ToString("yyyyMMdd")" aria-expanded="false" aria-controls="schedules-@sectionId-@schedules.Key.ToString("yyyyMMdd")">
+                                            @schedules.Key.ToString("yyyy-MM-dd") <span class="badge">@schedules.Count()</span>
+                                        </a>
+                                    </h4>
+                                </div>
+
+                                <div id="schedules-@sectionId-@schedules.Key.ToString("yyyyMMdd")" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-@sectionId-@schedules.Key.ToString("yyyyMMdd")">
+                                    <div class="panel-body">
+                                        @foreach (var schedule in schedules)
+                                        {
+                                            if (index == 0 || index % 3 == 0)
+                                            {
+                                                @:<div class="row">
+                                            }
+                                            index++;
+
+
+                                            <div class="col-md-4">
+                                                <div class="well well-sm text-center">
+                                                    <div>
+                                                        @if (schedule.IsFullfilled)
+                                                        {
+                                                            <span class="label label-default">NOT Available</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="label label-success">Available</span>
+                                                        }
+
+                                                        [
+                                                        <span title="@schedule.Start">@schedule.Start</span>
+                                                        -
+                                                        <span title="@schedule.End">@schedule.End</span>
+                                                        ] -
+                                                        @schedule.Duration minutes
+                                                    </div>
+                                                    <div>
+                                                        @Html.DisplayFor(modelItem => schedule.ForeignDoctorService.Name)
+                                                    </div>
+                                                    <div>
+                                                        @Html.ActionLink("Edit", "Edit", new { id = schedule.Id }) |
+                                                        @Html.ActionLink("Delete", "Delete", new { id = schedule.Id })
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            if (index == schedules.Count() || index % 3 == 0)
+                                            {
+                                                @:</div>
+                                            }
+                                        }
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

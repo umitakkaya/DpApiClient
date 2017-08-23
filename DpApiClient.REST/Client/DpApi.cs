@@ -434,6 +434,7 @@ namespace DpApiClient.REST.Client
                 var tokenResponse = _client.Post<AuthorizationToken>(request);
 
                 token = tokenResponse.Data;
+                token.ExpiresAt = DateTime.Now.AddSeconds(token.ExpiresIn);
 
                 Globals.SetToken(ClientId, token);
             }

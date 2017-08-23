@@ -40,7 +40,11 @@ namespace DpApiClient.Controllers
         // GET: Schedule
         public ActionResult Index()
         {
-            var doctorSchedules = repo.GetAll().Where(ds=> ds.Date.Add(ds.Start) >= DateTime.Now);
+            var doctorSchedules = repo.GetAll()
+                .Where(ds => ds.Date.Add(ds.Start) >= DateTime.Now)
+                .OrderBy(s => s.Date)
+                .ThenBy(s => s.Start);
+
             return View(doctorSchedules.ToList());
         }
 

@@ -51,6 +51,19 @@ namespace DpApiClient.Core
             }
         }
 
+        private IEnumerable<DoctorSchedule> GetSchedules(DoctorFacility doctorFacility, DateTime maxScheduleDate)
+        {
+            var schedules = _scheduleRepository.GetByDoctorFacility(doctorFacility)
+                .Where(s =>
+                    s.IsFullfilled == false &&
+                    s.Start < s.End &&
+                    s.Date.Add(s.Start) > DateTime.Now &&
+                    s.Date.Add(s.End) < maxScheduleDate
+                );
+
+            return schedules;
+        }
+
         public bool PushSlots(DoctorFacility doctorFacility)
         {
             var mapping = doctorFacility.DoctorMapping;
@@ -61,45 +74,29 @@ namespace DpApiClient.Core
             }
 
             var maxSlotDate = CultureInfo.InvariantCulture.Calendar.AddWeeks(DateTime.Now, 12);
-            var schedules = _scheduleRepository
-                .GetByDoctorFacility(doctorFacility)
-                .Where(s => s.IsFullfilled == false &&
-                    s.Start < s.End &&
-                    s.Date.Add(s.Start) > DateTime.Now &&
-                    s.Date.Add(s.End) < maxSlotDate);
+            var schedules = GetSchedules(doctorFacility, maxSlotDate);
 
             if (schedules.Count() == 0)
             {
                 return false;
             }
 
-            var result = true;
+            var calendarBlocks = CalendarGenerator.MergeSchedules(schedules);
+
             var address = mapping.ForeignAddress;
             var groupedSchedules = schedules.GroupBy(s => s.Date.Date);
             var defaultDoctorService = mapping.ForeignDoctorService;
 
-            foreach (var item in groupedSchedules)
+            var slots = calendarBlocks.Select(b => new SlotRange()
             {
+                Start = b.Start,
+                End = b.End,
+                DoctorServices = ConvertToSlotDoctorServiceList(b.DoctorService ?? defaultDoctorService, b.Duration)
+            });
 
-                var putSlotsRequest = new PutSlotsRequest()
-                {
-                    Slots = item.Select(s => new SlotRange()
-                    {
-                        Start          = s.Date.Add(s.Start).SetOffset(timeZone),
-                        End            = s.Date.Add(s.End).SetOffset(timeZone),
-                        DoctorServices = ConvertToSlotDoctorServiceList(s.ForeignDoctorService ?? defaultDoctorService, s.Duration)
-                    }).ToList()
-                };
+            var putSlotsRequest = new PutSlotsRequest() { Slots = slots.ToList() };
 
-                bool pushResult = _client.PutSlots(address.ForeignFacilityId, address.ForeignDoctorId, address.Id, putSlotsRequest);
-
-                if (false == pushResult)
-                {
-                    result = false;
-                }
-            }
-
-            return result;
+            return _client.PutSlots(address.ForeignFacilityId, address.ForeignDoctorId, address.Id, putSlotsRequest);
         }
 
         /// <summary>
@@ -118,12 +115,12 @@ namespace DpApiClient.Core
 
             var address = mapping.ForeignAddress;
 
-
             var startDate = TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now);
-            var endDate = startDate.Date.AddMonths(3); // 3 because you can put slots only for the next 3 months
+            var maxSlotDate = CultureInfo.InvariantCulture.Calendar.AddWeeks(DateTime.Now, 12);
+            var schedules = GetSchedules(doctorFacility, maxSlotDate)
+                .GroupBy(s => s.Date.Date);
 
-            
-            var slots = _client.GetSlots(address.ForeignFacilityId, address.ForeignDoctorId, address.Id, startDate, endDate);
+            var slots = _client.GetSlots(address.ForeignFacilityId, address.ForeignDoctorId, address.Id, startDate, maxSlotDate);
 
             //If there aren't any slots there is nothing to do.
             if (slots == null || slots.Any() == false)
@@ -135,6 +132,12 @@ namespace DpApiClient.Core
             //No need to send request for the days which don't have any slots.
             foreach (var item in slots.GroupBy(s => s.Start.Date))
             {
+                //If we have valid schedules for a day, do not clear it, it will be replaced anyway. 
+                if (schedules.Any(s => s.Key == item.Key))
+                {
+                    continue;
+                }
+
                 _client.DeleteSlots(address.ForeignFacilityId, address.ForeignDoctorId, address.Id, item.Key);
             }
 

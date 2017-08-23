@@ -79,6 +79,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppSettings.cs" />
+    <Compile Include="CalendarBlock.cs" />
+    <Compile Include="CalendarGenerator.cs" />
     <Compile Include="DPBookingException.cs" />
     <Compile Include="DPCancelException.cs" />
     <Compile Include="DPNotificationException.cs" />

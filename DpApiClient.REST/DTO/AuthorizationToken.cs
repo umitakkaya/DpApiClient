@@ -12,18 +12,7 @@ namespace DpApiClient.REST.DTO
         public string AccessToken { get; set; }
         public string TokenType { get; set; }
         public string Scope { get; set; }
-
-        public DateTime ExpiresAt { get; private set; }
-
-        private int _expiresIn = 0;
-        public int ExpiresIn
-        {
-            get { return _expiresIn; }
-            set
-            {
-                _expiresIn = value;
-                ExpiresAt = DateTime.Now.AddSeconds(value);
-            }
-        }
+        public int ExpiresIn { get; set; }
+        public DateTime ExpiresAt { get; set; }
     }
 }
